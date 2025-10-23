@@ -63,7 +63,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ userData, updateUserData, navigateT
     gender === null;
 
   return (
-    <div className="min-h-screen bg-bg-primary px-5 py-10 max-w-3xl mx-auto flex flex-col">
+    <div className="min-h-screen bg-gray-50 px-5 py-10 max-w-3xl mx-auto flex flex-col">
       <div className="flex justify-between items-center mb-8">
         <div className="text-primary text-2xl font-bold">NutriDigital</div>
         <ProgressBar currentStep={1} totalSteps={5} />

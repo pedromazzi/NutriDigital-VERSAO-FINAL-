@@ -76,7 +76,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
   };
 
   return (
-    <div className="min-h-screen bg-bg-primary px-5 py-10 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-gray-50 px-5 py-10 max-w-5xl mx-auto">
       {/* Cabeçalho */}
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold text-text-primary mb-2">

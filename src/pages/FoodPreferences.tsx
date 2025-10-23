@@ -36,7 +36,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-bg-primary px-5 py-10 max-w-3xl mx-auto">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center px-5 py-10 max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-8 w-full">
         <div className="text-primary text-2xl font-bold">NutriDigital</div>
         <ProgressBar currentStep={5} totalSteps={5} />

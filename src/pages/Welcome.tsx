@@ -25,12 +25,12 @@ const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo 
   return (
     <>
       {/* TELA PRINCIPAL */}
-      <div className="min-h-screen bg-bg-primary px-5 py-10 max-w-lg mx-auto flex flex-col justify-center">
+      <div className="min-h-screen bg-gray-50 px-5 py-10 max-w-lg mx-auto flex flex-col justify-center">
         
         {/* Logo */}
         <div className="text-center mb-10">
           <h1 className="text-primary text-3xl font-bold">
-            🍎 NutriDigital
+            NutriDigital
           </h1>
         </div>
 

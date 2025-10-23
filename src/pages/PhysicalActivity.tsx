@@ -75,7 +75,7 @@ const PhysicalActivity: React.FC<PhysicalActivityProps> = ({ userData, updateUse
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-bg-primary px-5 py-10 max-w-3xl mx-auto">
+    <div className="min-h-screen bg-gray-50 px-5 py-10 max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-8 w-full">
         <div className="text-primary text-2xl font-bold">NutriDigital</div>
         <ProgressBar currentStep={2} totalSteps={5} />
