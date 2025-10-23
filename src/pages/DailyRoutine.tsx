@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import ProgressBar from '@/components/ProgressBar';
+import Card from '@/components/Card'; // Importar o componente Card
 import { UserData } from '@/App'; // Importar a interface UserData
 import { validateMealTimesOrder } from '@/utils/validation';
 import { Coffee, UtensilsCrossed, Sandwich, Soup } from 'lucide-react';
@@ -111,6 +112,21 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
           </div>
         </div>
         {timeOrderError && <p className="text-red-500 text-xs mt-2 text-center">{timeOrderError}</p>}
+
+        {/* Dica sobre Rotina */}
+        <Card className="p-4 bg-yellow-50 border-yellow-200 mb-8">
+          <div className="flex gap-3 items-start">
+            <span className="text-2xl">💡</span>
+            <div>
+              <h4 className="font-semibold text-gray-800 mb-1">Dica: A importância da rotina alimentar</h4>
+              <p className="text-sm text-gray-700 leading-relaxed">
+                Manter horários regulares para suas refeições ajuda a regular seu metabolismo, 
+                controlar a fome ao longo do dia e evitar excessos. Tente respeitar os horários 
+                que você definiu, com uma variação máxima de 30 minutos para cada refeição.
+              </p>
+            </div>
+          </div>
+        </Card>
 
         <div className="flex justify-between mt-10">
           <Button variant="secondary" onClick={() => navigateTo('physicalActivity')}>
