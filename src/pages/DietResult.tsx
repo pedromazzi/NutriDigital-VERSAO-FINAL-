@@ -1,133 +1,168 @@
 import React from 'react';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
-import { UserData } from '@/App'; // Importar a interface UserData
+import { UserData } from '@/App'; // Importar a interface UserData do App.tsx
 import { Flame, Dumbbell, Droplet, Download, RefreshCcw } from 'lucide-react';
 
 interface DietResultProps {
   userData: UserData;
-  resetUserData: () => void;
+  resetUserData: () => void; // Adicionado para corresponder ao App.tsx
   navigateTo: (screen: string) => void;
 }
 
 const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, navigateTo }) => {
-  // Placeholder data for PROMPT 1
+  // Dados mockados para visualização da estrutura, usando a nova estrutura fornecida
   const dietPlan = userData.dietPlan || {
-    totalCalories: 2300,
-    totalProtein: 300,
-    totalCarbs: 150,
-    totalFat: 78,
-    totalWater: 3,
+    dailySummary: {
+      calories: 2300,
+      protein: 300,
+      carbs: 150,
+      fats: 78,
+      water: 3
+    },
     meals: [
       {
-        name: 'Café da manhã',
-        time: userData.mealTimes.breakfast || '08:00',
+        name: 'Café da Manhã',
+        time: userData?.mealTimes?.breakfast || '09:00',
         calories: 400,
-        items: [
-          { icon: '🥚', quantity: '2', food: 'Ovos' },
-          { icon: '🍞', quantity: '2 fatias', food: 'Pão integral' },
-          { icon: '🍌', quantity: '1', food: 'Banana' },
-        ],
+        foods: [
+          { emoji: '🥚', quantity: '2 unidades', name: 'ovos' },
+          { emoji: '🍞', quantity: '2 fatias', name: 'pão integral' },
+          { emoji: '🍌', quantity: '1 unidade', name: 'banana' }
+        ]
       },
       {
         name: 'Almoço',
-        time: userData.mealTimes.lunch || '13:00',
-        calories: 800,
-        items: [
-          { icon: '🍗', quantity: '150g', food: 'Peito de frango' },
-          { icon: '🍚', quantity: '150g', food: 'Arroz integral' },
-          { icon: '🥗', quantity: 'À vontade', food: 'Salada mista' },
-          { icon: '🫘', quantity: '1 concha', food: 'Feijão' },
-        ],
+        time: userData?.mealTimes?.lunch || '12:00',
+        calories: 650,
+        foods: [
+          { emoji: '🍚', quantity: '250g', name: 'arroz branco cozido' },
+          { emoji: '🍗', quantity: '150g', name: 'peito de frango' },
+          { emoji: '🫒', quantity: '10ml', name: 'azeite de oliva' }
+        ]
       },
       {
         name: 'Lanche da Tarde',
-        time: userData.mealTimes.snack || '17:00',
+        time: userData?.mealTimes?.snack || '16:00',
         calories: 300,
-        items: [
-          { icon: '🥛', quantity: '1 copo', food: 'Iogurte grego' },
-          { icon: '🍓', quantity: '100g', food: 'Frutas vermelhas' },
-          { icon: '🥜', quantity: '1 colher', food: 'Pasta de amendoim' },
-        ],
+        foods: [
+          { emoji: '💪', quantity: '30g', name: 'whey protein' },
+          { emoji: '🥛', quantity: '200ml', name: 'leite integral' },
+          { emoji: '🍓', quantity: '100g', name: 'morango' }
+        ]
       },
       {
         name: 'Jantar',
-        time: userData.mealTimes.dinner || '20:00',
-        calories: 600,
-        items: [
-          { icon: '🐟', quantity: '120g', food: 'Salmão' },
-          { icon: '🥔', quantity: '150g', food: 'Batata doce' },
-          { icon: '🥦', quantity: 'À vontade', food: 'Brócolis' },
-        ],
-      },
-    ],
+        time: userData?.mealTimes?.dinner || '19:00',
+        calories: 650,
+        foods: [
+          { emoji: '🐟', quantity: '150g', name: 'salmão' },
+          { emoji: '🥔', quantity: '200g', name: 'batata doce' },
+          { emoji: '🥬', quantity: 'à gosto', name: 'vegetais' }
+        ]
+      }
+    ]
   };
 
-  const handleDownloadPdf = () => {
-    alert('Funcionalidade de download de PDF será implementada no PROMPT 3!');
-    // Logic for PDF generation will go here in PROMPT 3
+  const handleDownloadPDF = () => {
+    alert('Funcionalidade de download de PDF será implementada no PROMPT 3 - Cérebro do App');
   };
 
   const handleNewDiet = () => {
-    resetUserData();
-    navigateTo('welcome');
+    if (window.confirm('Deseja criar uma nova dieta? Todos os dados serão perdidos.')) {
+      resetUserData(); // Usar a prop resetUserData
+      navigateTo('welcome');
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-50 p-4">
       <div className="w-full max-w-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Dieta Pronta</h1>
-          <p className="text-gray-600">Este é o seu plano de dieta personalizado para o dia.</p>
+        {/* Cabeçalho */}
+        <div className="mb-10 text-center">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            Dieta Pronta
+          </h1>
+          <p className="text-base text-gray-600">
+            Este é o seu plano de dieta personalizado para o dia.
+          </p>
         </div>
 
         {/* Resumo Diário */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-          <Card className="flex flex-col items-center p-4 bg-white border border-gray-200">
-            <Flame size={24} className="text-orange-500 mb-2" />
-            <span className="text-sm text-gray-600">Calorias</span>
-            <span className="font-bold text-lg text-gray-800">{dietPlan.totalCalories} kcal</span>
-          </Card>
-          <Card className="flex flex-col items-center p-4 bg-white border border-gray-200">
-            <Dumbbell size={24} className="text-green-600 mb-2" />
-            <span className="text-sm text-gray-600">Proteína</span>
-            <span className="font-bold text-lg text-gray-800">{dietPlan.totalProtein}g</span>
-          </Card>
-          <Card className="flex flex-col items-center p-4 bg-white border border-gray-200">
-            <span className="text-pink-500 mb-2 text-2xl">🌾</span> {/* Substituído por emoji */}
-            <span className="text-sm text-gray-600">Carboidratos</span>
-            <span className="font-bold text-lg text-gray-800">{dietPlan.totalCarbs}g</span>
-          </Card>
-          <Card className="flex flex-col items-center p-4 bg-white border border-gray-200">
-            <span className="text-yellow-600 mb-2 text-2xl">🥑</span> {/* Substituído por emoji */}
-            <span className="text-sm text-gray-600">Gordura</span>
-            <span className="font-bold text-lg text-gray-800">{dietPlan.totalFat}g</span>
-          </Card>
-          <Card className="flex flex-col items-center p-4 bg-white border border-gray-200">
-            <Droplet size={24} className="text-blue-500 mb-2" />
-            <span className="text-sm text-gray-600">Água</span>
-            <span className="font-bold text-lg text-gray-800">{dietPlan.totalWater}L</span>
-          </Card>
+        <div className="mb-10">
+          <h3 className="text-xl font-semibold text-gray-800 mb-5">
+            Resumo Diário
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {/* Calorias */}
+            <Card className="flex flex-col items-center p-4 bg-white border border-gray-200">
+              <Flame size={32} className="text-orange-500 mb-2" />
+              <span className="text-sm text-gray-600">Calorias</span>
+              <span className="font-bold text-lg text-gray-800">{dietPlan.dailySummary.calories} kcal</span>
+            </Card>
+
+            {/* Proteína */}
+            <Card className="flex flex-col items-center p-4 bg-green-50 border-green-200">
+              <Dumbbell size={32} className="text-green-600 mb-2" />
+              <span className="text-sm text-gray-600">Proteína</span>
+              <span className="font-bold text-lg text-green-600">{dietPlan.dailySummary.protein}g</span>
+            </Card>
+
+            {/* Carboidratos */}
+            <Card className="flex flex-col items-center p-4 bg-red-50 border-red-200">
+              <span className="text-3xl mb-2">🌾</span>
+              <span className="text-sm text-gray-600">Carboidratos</span>
+              <span className="font-bold text-lg text-red-600">{dietPlan.dailySummary.carbs}g</span>
+            </Card>
+
+            {/* Gordura */}
+            <Card className="flex flex-col items-center p-4 bg-yellow-50 border-yellow-200">
+              <span className="text-3xl mb-2">🥑</span>
+              <span className="text-sm text-gray-600">Gordura</span>
+              <span className="font-bold text-lg text-yellow-600">{dietPlan.dailySummary.fats}g</span>
+            </Card>
+
+            {/* Água */}
+            <Card className="flex flex-col items-center p-4 bg-blue-50 border-blue-200">
+              <Droplet size={32} className="text-blue-600 mb-2" />
+              <span className="text-sm text-gray-600">Água</span>
+              <span className="font-bold text-lg text-blue-600">{dietPlan.dailySummary.water}L</span>
+            </Card>
+          </div>
         </div>
 
-        {/* Grade de Refeições */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {dietPlan.meals.map((meal, index) => (
-            <Card key={index} className="p-4 bg-white border border-gray-200">
-              <h3 className="font-bold text-lg text-gray-800 mb-1">
-                {meal.name} ({meal.time})
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">{meal.calories}kcal</p>
-              <ul className="space-y-1">
-                {meal.items.map((item, itemIndex) => (
-                  <li key={itemIndex} className="flex items-center text-gray-700 text-sm">
-                    <span className="mr-2">{item.icon}</span>
-                    <span>{item.quantity} {item.food}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          ))}
+        {/* Refeições - Grid 2x2 */}
+        <div className="mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {dietPlan.meals.map((meal, index) => (
+              <Card key={index} className="p-5 bg-white border border-gray-200">
+                {/* Header da refeição */}
+                <div className="mb-4 pb-3 border-b border-gray-100">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-1">
+                    {meal.name} ({meal.time})
+                  </h4>
+                  <p className="text-sm font-semibold text-green-600">
+                    {meal.calories}kcal
+                  </p>
+                </div>
+
+                {/* Lista de alimentos */}
+                <div className="flex flex-col gap-2">
+                  {meal.foods.map((food, foodIndex) => (
+                    <div
+                      key={foodIndex}
+                      className="flex items-center gap-2 text-sm text-gray-700"
+                    >
+                      <span className="text-lg">{food.emoji}</span>
+                      <span>
+                        <strong className="font-medium">{food.quantity}</strong> {food.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Dicas Alimentares */}
@@ -232,16 +267,16 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
           </div>
         </Card>
 
-          <Card className="p-4 bg-gray-100 border-gray-200">
-            <h3 className="font-bold text-gray-800 mb-2">Disclaimer</h3>
-            <p className="text-sm text-gray-700">
-              Este plano alimentar é uma sugestão e deve ser adaptado às suas necessidades individuais. Consulte sempre um profissional de saúde ou nutricionista antes de iniciar qualquer nova dieta.
-            </p>
-          </Card>
-        </div>
+        {/* Disclaimer */}
+        <Card className="p-4 bg-gray-100 border-gray-200 mb-8">
+          <h3 className="font-bold text-gray-800 mb-2">Disclaimer</h3>
+          <p className="text-sm text-gray-700">
+            Este plano alimentar é uma sugestão e deve ser adaptado às suas necessidades individuais. Consulte sempre um profissional de saúde ou nutricionista antes de iniciar qualquer nova dieta.
+          </p>
+        </Card>
 
         <div className="flex flex-col items-center space-y-4 mt-8">
-          <Button fullWidth onClick={handleDownloadPdf} className="bg-orange-500 hover:bg-orange-600">
+          <Button fullWidth onClick={handleDownloadPDF} className="bg-orange-500 hover:bg-orange-600">
             <Download size={20} className="inline-block mr-2" /> Baixar Dieta em PDF
           </Button>
           <Button variant="secondary" onClick={handleNewDiet} className="w-full">
