@@ -4,6 +4,7 @@ import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
 import { UserData } from '@/App'; // Importar a interface UserData
 import { Check } from 'lucide-react'; // Importar ícone de check
+import { cn } from '@/lib/utils';
 
 interface PhysicalActivityProps {
   userData: UserData;
@@ -74,80 +75,84 @@ const PhysicalActivity: React.FC<PhysicalActivityProps> = ({ userData, updateUse
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gray-50 p-4">
-      <div className="w-full max-w-md">
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-2xl font-bold text-green-600">NutriDigital</div>
-          <ProgressBar currentStep={2} totalSteps={5} />
-        </div>
+    <div className="min-h-screen flex flex-col items-center bg-bg-primary px-5 py-10 max-w-3xl mx-auto">
+      <div className="flex justify-between items-center mb-8 w-full">
+        <div className="text-primary text-2xl font-bold">NutriDigital</div>
+        <ProgressBar currentStep={2} totalSteps={5} />
+      </div>
 
-        <h1 className="text-2xl font-bold text-gray-800 mb-8">Você pratica atividade física regularmente?</h1>
+      <h1 className="text-3xl font-bold text-text-primary mb-8 text-center">Você pratica atividade física regularmente?</h1>
 
-        <div className="flex justify-center space-x-4 mb-8">
-          <Button
-            variant={practicesActivity === true ? 'primary' : 'secondary'}
-            onClick={() => {
-              setPracticesActivity(true);
-              setActivityLevelError(''); // Clear error when selecting "Sim"
-            }}
-            className={practicesActivity === true ? 'bg-green-500 hover:bg-green-600' : ''}
-          >
-            Sim
-          </Button>
-          <Button
-            variant={practicesActivity === false ? 'primary' : 'secondary'}
-            onClick={() => {
-              setPracticesActivity(false);
-              setActivityLevel(null); // Limpar seleção de nível
-              setActivityLevelError(''); // Clear error when selecting "Não"
-            }}
-            className={practicesActivity === false ? 'bg-gray-400 hover:bg-gray-500' : ''}
-          >
-            Não
-          </Button>
-        </div>
-        {practicesActivity === null && activityLevelError && <p className="text-red-500 text-xs mt-2 text-center">{activityLevelError}</p>}
+      <div className="grid grid-cols-2 gap-3 mb-8 w-full">
+        <Button
+          variant={practicesActivity === true ? 'primary' : 'secondary'}
+          onClick={() => {
+            setPracticesActivity(true);
+            setActivityLevelError(''); // Clear error when selecting "Sim"
+          }}
+          className={cn(
+            "p-4 rounded-lg font-semibold flex items-center justify-center gap-2",
+            practicesActivity === true ? 'bg-primary hover:bg-primary-dark' : 'bg-gray-200 text-text-primary hover:bg-gray-300'
+          )}
+        >
+          Sim
+        </Button>
+        <Button
+          variant={practicesActivity === false ? 'primary' : 'secondary'}
+          onClick={() => {
+            setPracticesActivity(false);
+            setActivityLevel(null); // Limpar seleção de nível
+            setActivityLevelError(''); // Clear error when selecting "Não"
+          }}
+          className={cn(
+            "p-4 rounded-lg font-semibold flex items-center justify-center gap-2",
+            practicesActivity === false ? 'bg-gray-400 hover:bg-gray-500 text-white' : 'bg-gray-200 text-text-primary hover:bg-gray-300'
+          )}
+        >
+          Não
+        </Button>
+      </div>
+      {practicesActivity === null && activityLevelError && <p className="text-red-500 text-sm mt-2 text-center">{activityLevelError}</p>}
 
 
-        {practicesActivity === true && (
-          <div className="mb-8 animate-fadeIn">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Qual o nível de intensidade da sua atividade?</h2>
-            <div className="space-y-4">
-              {activityLevelsOptions.map((level) => (
-                <Card
-                  key={level.value}
-                  onClick={() => {
-                    setActivityLevel(level.value);
-                    setActivityLevelError(''); // Clear error when selecting a level
-                  }}
-                  selected={activityLevel === level.value}
-                  variant="goal" // Usando variant="goal" para um estilo de seleção claro
-                  className="flex items-center justify-between p-4"
-                >
-                  <div>
-                    <h3 className="font-medium text-gray-800">{level.label}</h3>
-                    <p className="text-sm text-gray-600">{level.description}</p>
+      {practicesActivity === true && (
+        <div className="mb-8 animate-fadeIn w-full">
+          <h2 className="text-xl font-semibold text-text-primary mb-4 text-center">Qual o nível de intensidade da sua atividade?</h2>
+          <div className="flex flex-col gap-3">
+            {activityLevelsOptions.map((level) => (
+              <Card
+                key={level.value}
+                onClick={() => {
+                  setActivityLevel(level.value);
+                  setActivityLevelError(''); // Clear error when selecting a level
+                }}
+                selected={activityLevel === level.value}
+                variant="outlined"
+                className="flex items-center justify-between p-4"
+              >
+                <div>
+                  <h3 className="font-medium text-text-primary text-base">{level.label}</h3>
+                  <p className="text-sm text-text-secondary">{level.description}</p>
+                </div>
+                {activityLevel === level.value && (
+                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white">
+                    <Check size={16} />
                   </div>
-                  {activityLevel === level.value && (
-                    <div className="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center text-white">
-                      <Check size={16} />
-                    </div>
-                  )}
-                </Card>
-              ))}
-            </div>
-            {activityLevelError && <p className="text-red-500 text-xs mt-2 text-center">{activityLevelError}</p>}
+                )}
+              </Card>
+            ))}
           </div>
-        )}
-
-        <div className="flex justify-between mt-10">
-          <Button variant="secondary" onClick={() => navigateTo('userInfo')}>
-            Voltar
-          </Button>
-          <Button variant="primary" onClick={handleAdvance} disabled={isButtonDisabled}>
-            Avançar
-          </Button>
+          {activityLevelError && <p className="text-red-500 text-sm mt-2 text-center">{activityLevelError}</p>}
         </div>
+      )}
+
+      <div className="flex gap-3 mt-10 w-full">
+        <Button variant="secondary" onClick={() => navigateTo('userInfo')} className="flex-1 py-3.5">
+          Voltar
+        </Button>
+        <Button variant="primary" onClick={handleAdvance} disabled={isButtonDisabled} className="flex-[2] py-3.5">
+          Avançar
+        </Button>
       </div>
     </div>
   );

@@ -8,14 +8,19 @@ interface ProgressBarProps {
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ currentStep, totalSteps, className }) => {
-  const progress = (currentStep / totalSteps) * 100;
+  const percentage = (currentStep / totalSteps) * 100;
 
   return (
-    <div className={cn("w-full bg-gray-200 rounded-full h-2.5 mb-6", className)}>
-      <div
-        className="bg-green-600 h-2.5 rounded-full transition-all duration-500 ease-out"
-        style={{ width: `${progress}%` }}
-      ></div>
+    <div className={cn("mb-8", className)}>
+      <p className="text-sm text-text-secondary mb-2">
+        Passo {currentStep} de {totalSteps}
+      </p>
+      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-primary transition-all duration-300 ease-out"
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
     </div>
   );
 };

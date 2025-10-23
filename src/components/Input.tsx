@@ -5,15 +5,16 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   suffix?: string;
+  labelClassName?: string; // Adicionado para permitir estilizar o label
 }
 
-const Input: React.FC<InputProps> = ({ label, error, suffix, className, id, ...props }) => {
+const Input: React.FC<InputProps> = ({ label, error, suffix, className, id, labelClassName, ...props }) => {
   const inputId = id || (label ? label.toLowerCase().replace(/\s/g, '-') : undefined);
 
   return (
-    <div className="mb-4">
+    <div className={cn("mb-5", className)}>
       {label && (
-        <label htmlFor={inputId} className="block text-gray-700 text-sm font-medium mb-1">
+        <label htmlFor={inputId} className={cn("block mb-2 text-text-primary font-medium", labelClassName)}>
           {label}
         </label>
       )}
@@ -21,20 +22,20 @@ const Input: React.FC<InputProps> = ({ label, error, suffix, className, id, ...p
         <input
           id={inputId}
           className={cn(
-            'w-full p-3 border rounded-lg focus:outline-none focus:ring-2',
-            error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-green-500',
-            suffix ? 'pr-10' : '', // Add padding for suffix
-            className
+            'w-full px-3 py-3 text-base border rounded-lg transition-colors',
+            error ? 'border-red-500' : 'border-border-light',
+            'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20',
+            suffix ? 'pr-12' : '',
           )}
           {...props}
         />
         {suffix && (
-          <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 text-sm">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary">
             {suffix}
           </span>
         )}
       </div>
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
   );
 };

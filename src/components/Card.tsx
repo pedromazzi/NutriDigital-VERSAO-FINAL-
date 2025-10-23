@@ -5,30 +5,41 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   onClick?: () => void;
   selected?: boolean;
-  variant?: 'info' | 'goal' | 'food-category';
+  variant?: 'default' | 'outlined' | 'elevated' | 'goal' | 'food-category'; // Mantendo as variantes existentes e adicionando as novas
 }
 
 const Card: React.FC<CardProps> = ({
   children,
   onClick,
   selected = false,
-  variant = 'info',
+  variant = 'default',
   className,
   ...props
 }) => {
-  const baseClasses = 'p-4 rounded-lg shadow-sm transition-all duration-200 cursor-pointer';
+  const baseClasses = 'rounded-lg transition-all duration-200';
   
-  const variantClasses = {
-    info: 'bg-white border border-gray-200 hover:shadow-md',
-    goal: 'bg-white border border-gray-200 hover:border-green-500',
-    'food-category': 'bg-white border border-gray-200 hover:border-green-500',
+  const variants = {
+    default: 'bg-white border border-border-light',
+    outlined: selected 
+      ? 'bg-primary-light border-2 border-primary' 
+      : 'bg-white border border-border-light hover:border-primary/50',
+    elevated: selected
+      ? 'bg-primary-light border-2 border-primary shadow-card-hover transform -translate-y-0.5'
+      : 'bg-white border border-border-light shadow-card hover:shadow-card-hover',
+    // Mantendo as variantes 'goal' e 'food-category' para compatibilidade, mas mapeando para 'outlined' ou 'elevated' se necessário
+    goal: selected 
+      ? 'bg-primary-light border-2 border-primary shadow-card-hover transform -translate-y-0.5' 
+      : 'bg-white border border-border-light shadow-card hover:shadow-card-hover',
+    'food-category': selected 
+      ? 'bg-primary-light border-2 border-primary shadow-card-hover transform -translate-y-0.5' 
+      : 'bg-white border border-border-light shadow-card hover:shadow-card-hover',
   };
 
-  const selectedClasses = selected ? 'border-green-500 ring-2 ring-green-500' : '';
+  const clickableClasses = onClick ? 'cursor-pointer' : '';
 
   return (
     <div
-      className={cn(baseClasses, variantClasses[variant], selectedClasses, className)}
+      className={cn(baseClasses, variants[variant], clickableClasses, className)}
       onClick={onClick}
       {...props}
     >

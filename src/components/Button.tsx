@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'orange';
   fullWidth?: boolean;
 }
 
@@ -15,20 +15,20 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseClasses = 'px-6 py-3 rounded-lg font-semibold transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+  const baseClasses = 'px-6 py-3 rounded-lg font-semibold text-base transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
   
-  const variantClasses = {
-    primary: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+  const variants = {
+    primary: 'bg-primary text-white hover:bg-primary-dark active:scale-95',
+    secondary: 'bg-gray-200 text-text-primary hover:bg-gray-300 active:scale-95',
+    danger: 'bg-red-500 text-white hover:bg-red-600 active:scale-95',
+    orange: 'bg-secondary-orange text-white hover:bg-orange-600 active:scale-95',
   };
 
-  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
-  const widthClasses = fullWidth ? 'w-full' : '';
+  const widthClass = fullWidth ? 'w-full' : '';
 
   return (
     <button
-      className={cn(baseClasses, variantClasses[variant], widthClasses, disabledClasses, className)}
+      className={cn(baseClasses, variants[variant], widthClass, className)}
       disabled={disabled}
       {...props}
     >
