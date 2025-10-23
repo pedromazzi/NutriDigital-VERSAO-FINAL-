@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import Button from '@/components/Button';
-import Modal from '@/components/Modal';
 import { UserData } from '@/App'; // Importar a interface UserData
 
 interface WelcomeProps {
@@ -11,20 +9,86 @@ interface WelcomeProps {
 
 const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo }) => {
   const [showTerms, setShowTerms] = useState(false);
-  const [localName, setLocalName] = useState(userData.userName || '');
-  const [localTermsAccepted, setLocalTermsAccepted] = useState(userData.termsAccepted || false);
+  const [localName, setLocalName] = useState(userData?.userName || '');
+  const [localTermsAccepted, setLocalTermsAccepted] = useState(userData?.termsAccepted || false);
 
   const handleNext = () => {
+    // Salvar dados no estado global
     updateUserData('userName', localName);
     updateUserData('termsAccepted', localTermsAccepted);
+    
+    // Navegar para próxima tela
     navigateTo('userInfo');
   };
 
   const isButtonDisabled = !localTermsAccepted || localName.length < 2;
 
+  // Estilos dos botões
+  const primaryButtonStyle = {
+    backgroundColor: '#FF8C1A',
+    color: 'white',
+    padding: '14px 28px',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: isButtonDisabled ? 'not-allowed' : 'pointer',
+    fontSize: '16px',
+    fontWeight: '600',
+    width: '100%',
+    opacity: isButtonDisabled ? 0.5 : 1,
+    marginTop: '10px'
+  };
+
+  const closeButtonStyle = {
+    backgroundColor: '#00D26A',
+    color: 'white',
+    padding: '12px 24px',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: '600',
+    width: '100%'
+  };
+
+  const modalOverlayStyle = {
+    position: 'fixed' as 'fixed', // Explicitly cast to 'fixed'
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 9999,
+    padding: '20px'
+  };
+
+  const modalContentStyle = {
+    backgroundColor: 'white',
+    padding: '30px',
+    borderRadius: '12px',
+    maxWidth: '600px',
+    width: '100%',
+    maxHeight: '80vh',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column' as 'column', // Explicitly cast to 'column'
+    boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+  };
+
+  const modalBodyStyle = {
+    overflowY: 'auto' as 'auto', // Explicitly cast to 'auto'
+    marginBottom: '20px',
+    flex: 1,
+    paddingRight: '10px'
+  };
+
   return (
     <>
+      {/* TELA PRINCIPAL */}
       <div className="p-4 max-w-md mx-auto min-h-screen bg-gray-50 flex flex-col justify-center">
+        
         {/* Logo */}
         <div className="text-center mb-10">
           <h1 className="text-green-600 text-3xl font-bold">
@@ -92,48 +156,77 @@ const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo 
         </label>
 
         {/* Botão Começar */}
-        <Button
-          fullWidth
-          onClick={handleNext}
+        <button
           disabled={isButtonDisabled}
-          className="bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg font-semibold text-base transition-colors duration-200"
+          onClick={handleNext}
+          style={primaryButtonStyle}
         >
           Começar
-        </Button>
+        </button>
       </div>
 
       {/* MODAL DE TERMOS DE USO */}
-      <Modal isOpen={showTerms} onClose={() => setShowTerms(false)} title="Termos de Uso e Aviso Legal">
-        <p className="mb-4 leading-relaxed text-gray-700 text-sm">
-          As informações, planos alimentares e sugestões nutricionais disponibilizados 
-          por este aplicativo são gerados automaticamente por meio de inteligência 
-          artificial e têm caráter exclusivamente informativo e educativo.
-        </p>
-        
-        <p className="mb-4 leading-relaxed text-gray-700 text-sm">
-          O conteúdo fornecido não constitui orientação, prescrição ou acompanhamento 
-          nutricional individualizado, nem substitui a consulta com profissionais de 
-          saúde qualificados, como nutricionistas, médicos ou outros especialistas.
-        </p>
-        
-        <p className="mb-4 leading-relaxed text-gray-700 text-sm">
-          Antes de iniciar qualquer plano alimentar, dieta, suplementação ou mudança 
-          nos hábitos alimentares, o usuário deve consultar um profissional habilitado 
-          para avaliar suas condições de saúde, restrições e necessidades específicas.
-        </p>
-        
-        <p className="mb-4 leading-relaxed text-gray-700 text-sm">
-          O aplicativo, seus desenvolvedores e parceiros não se responsabilizam por 
-          quaisquer danos diretos, indiretos, incidentais ou consequenciais decorrentes 
-          do uso, interpretação ou aplicação das informações fornecidas pela plataforma.
-        </p>
-        
-        <p className="leading-relaxed text-gray-700 text-sm">
-          Ao utilizar este aplicativo, o usuário reconhece e concorda que todas as 
-          informações apresentadas são sugestões automatizadas e que o uso é de inteira 
-          responsabilidade do usuário.
-        </p>
-      </Modal>
+      {showTerms && (
+        <div 
+          onClick={() => setShowTerms(false)}
+          style={modalOverlayStyle}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={modalContentStyle}
+          >
+            <h2 style={{ 
+              marginTop: 0, 
+              marginBottom: '20px', 
+              fontSize: '22px',
+              color: '#1A1A1A',
+              fontWeight: 'bold'
+            }}>
+              Termos de Uso e Aviso Legal
+            </h2>
+            
+            <div style={modalBodyStyle}>
+              <p style={{ marginBottom: '15px', lineHeight: '1.6', color: '#333', fontSize: '15px' }}>
+                As informações, planos alimentares e sugestões nutricionais disponibilizados 
+                por este aplicativo são gerados automaticamente por meio de inteligência 
+                artificial e têm caráter exclusivamente informativo e educativo.
+              </p>
+              
+              <p style={{ marginBottom: '15px', lineHeight: '1.6', color: '#333', fontSize: '15px' }}>
+                O conteúdo fornecido não constitui orientação, prescrição ou acompanhamento 
+                nutricional individualizado, nem substitui a consulta com profissionais de 
+                saúde qualificados, como nutricionistas, médicos ou outros especialistas.
+              </p>
+              
+              <p style={{ marginBottom: '15px', lineHeight: '1.6', color: '#333', fontSize: '15px' }}>
+                Antes de iniciar qualquer plano alimentar, dieta, suplementação ou mudança 
+                nos hábitos alimentares, o usuário deve consultar um profissional habilitado 
+                para avaliar suas condições de saúde, restrições e necessidades específicas.
+              </p>
+              
+              <p style={{ marginBottom: '15px', lineHeight: '1.6', color: '#333', fontSize: '15px' }}>
+                O aplicativo, seus desenvolvedores e parceiros não se responsabilizam por 
+                quaisquer danos diretos, indiretos, incidentais ou consequenciais decorrentes 
+                do uso, interpretação ou aplicação das informações fornecidas pela plataforma.
+              </p>
+              
+              <p style={{ marginBottom: '0', lineHeight: '1.6', color: '#333', fontSize: '15px' }}>
+                Ao utilizar este aplicativo, o usuário reconhece e concorda que todas as 
+                informações apresentadas são sugestões automatizadas e que o uso é de inteira 
+                responsabilidade do usuário.
+              </p>
+            </div>
+
+            {/* BOTÃO FECHAR - USANDO <button> HTML, NÃO O COMPONENTE Button */}
+            <button 
+              onClick={() => setShowTerms(false)}
+              style={closeButtonStyle}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };
