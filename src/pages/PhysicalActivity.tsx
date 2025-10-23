@@ -3,7 +3,7 @@ import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
 import { UserData } from '@/App'; // Importar a interface UserData
-import { Check } from 'lucide-react'; // Importar ícone de check
+import { Check, Activity, Ban } from 'lucide-react'; // Importar ícones de check, Activity e Ban
 import { cn } from '@/lib/utils';
 
 interface PhysicalActivityProps {
@@ -84,33 +84,40 @@ const PhysicalActivity: React.FC<PhysicalActivityProps> = ({ userData, updateUse
       <h1 className="text-3xl font-bold text-text-primary mb-8 text-center">Você pratica atividade física regularmente?</h1>
 
       <div className="grid grid-cols-2 gap-3 mb-8 w-full">
-        <Button
-          variant={practicesActivity === true ? 'primary' : 'secondary'}
+        {/* Sim */}
+        <button
           onClick={() => {
             setPracticesActivity(true);
             setActivityLevelError(''); // Clear error when selecting "Sim"
           }}
           className={cn(
-            "p-4 rounded-lg font-semibold flex items-center justify-center gap-2",
-            practicesActivity === true ? 'bg-primary hover:bg-primary-dark' : 'bg-gray-200 text-text-primary hover:bg-gray-300'
+            "p-4 border rounded-lg cursor-pointer font-semibold flex items-center justify-center gap-2 transition-all",
+            practicesActivity === true 
+              ? 'border-2 border-primary bg-primary/10' 
+              : 'border-gray-200 hover:border-primary/50'
           )}
         >
+          <Activity className="w-5 h-5" />
           Sim
-        </Button>
-        <Button
-          variant={practicesActivity === false ? 'primary' : 'secondary'}
+        </button>
+
+        {/* Não */}
+        <button
           onClick={() => {
             setPracticesActivity(false);
             setActivityLevel(null); // Limpar seleção de nível
             setActivityLevelError(''); // Clear error when selecting "Não"
           }}
           className={cn(
-            "p-4 rounded-lg font-semibold flex items-center justify-center gap-2",
-            practicesActivity === false ? 'bg-gray-400 hover:bg-gray-500 text-white' : 'bg-gray-200 text-text-primary hover:bg-gray-300'
+            "p-4 border rounded-lg cursor-pointer font-semibold flex items-center justify-center gap-2 transition-all",
+            practicesActivity === false 
+              ? 'border-2 border-primary bg-primary/10' 
+              : 'border-gray-200 hover:border-primary/50'
           )}
         >
+          <Ban className="w-5 h-5" />
           Não
-        </Button>
+        </button>
       </div>
       {practicesActivity === null && activityLevelError && <p className="text-red-500 text-sm mt-2 text-center">{activityLevelError}</p>}
 

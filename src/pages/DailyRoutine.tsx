@@ -3,6 +3,7 @@ import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import { UserData } from '@/App'; // Importar a interface UserData
 import { validateMealTimesOrder } from '@/utils/validation';
+import { Coffee, UtensilsCrossed, Cookie, Moon } from 'lucide-react'; // Importar ícones Lucide
 
 interface DailyRoutineProps {
   userData: UserData;
@@ -66,8 +67,8 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
         {/* Café da Manhã */}
         <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
-              ☕
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Coffee className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
               Café da Manhã
@@ -84,8 +85,8 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
         {/* Almoço */}
         <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
-              🍽️
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+              <UtensilsCrossed className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
               Almoço
@@ -102,8 +103,8 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
         {/* Lanche da Tarde */}
         <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
-              🥪
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Cookie className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
               Lanche da Tarde
@@ -120,8 +121,8 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
         {/* Jantar */}
         <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
-              🌙
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Moon className="w-6 h-6 text-primary" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
               Jantar

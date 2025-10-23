@@ -5,6 +5,7 @@ import ProgressBar from '@/components/ProgressBar';
 import { UserData } from '@/App'; // Importar a interface UserData
 import { validateWeight, validateAge, validateHeight } from '@/utils/validation';
 import { cn } from '@/lib/utils'; // Importar cn para classes condicionais
+import { User } from 'lucide-react'; // Importar ícone User
 
 interface UserInfoProps {
   userData: UserData;
@@ -110,38 +111,29 @@ const UserInfo: React.FC<UserInfoProps> = ({ userData, updateUserData, navigateT
         <div>
           <label className="block text-text-primary font-medium mb-2">Qual o seu gênero?</label>
           <div className="grid grid-cols-2 gap-3">
-            <label
+            {/* Masculino */}
+            <button
+              onClick={() => setGender('Masculino')}
               className={cn(
-                "p-4 border rounded-lg cursor-pointer text-base font-medium text-text-primary text-center",
-                gender === 'Masculino' ? 'border-primary bg-primary-light border-2' : 'border-gray-200 hover:border-primary/50'
+                "p-4 border rounded-lg cursor-pointer text-base font-medium text-text-primary text-center transition-all flex items-center justify-center gap-2",
+                gender === 'Masculino' ? 'border-2 border-primary bg-primary/10' : 'border-gray-200 hover:border-primary/50'
               )}
             >
-              <input
-                type="radio"
-                name="gender"
-                value="Masculino"
-                checked={gender === 'Masculino'}
-                onChange={() => setGender('Masculino')}
-                className="sr-only" // Esconder o radio button nativo
-              />
+              <User className="w-5 h-5" />
               Masculino
-            </label>
-            <label
+            </button>
+
+            {/* Feminino */}
+            <button
+              onClick={() => setGender('Feminino')}
               className={cn(
-                "p-4 border rounded-lg cursor-pointer text-base font-medium text-text-primary text-center",
-                gender === 'Feminino' ? 'border-primary bg-primary-light border-2' : 'border-gray-200 hover:border-primary/50'
+                "p-4 border rounded-lg cursor-pointer text-base font-medium text-text-primary text-center transition-all flex items-center justify-center gap-2",
+                gender === 'Feminino' ? 'border-2 border-primary bg-primary/10' : 'border-gray-200 hover:border-primary/50'
               )}
             >
-              <input
-                type="radio"
-                name="gender"
-                value="Feminino"
-                checked={gender === 'Feminino'}
-                onChange={() => setGender('Feminino')}
-                className="sr-only" // Esconder o radio button nativo
-              />
+              <User className="w-5 h-5" />
               Feminino
-            </label>
+            </button>
           </div>
           {genderError && <p className="text-red-500 text-xs mt-1">{genderError}</p>}
         </div>
