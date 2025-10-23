@@ -3,7 +3,7 @@ import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card'; // Importar o componente Card
 import { UserData } from '@/App'; // Importar a interface UserData
-import { Check } from 'lucide-react'; // Importar ícone de check para o badge
+import { Check, Coffee, UtensilsCrossed, Cookie, Moon } from 'lucide-react'; // Importar ícones de check e refeições
 
 interface FoodPreferencesProps {
   userData: UserData;
@@ -33,6 +33,13 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
 
   const handleBack = () => {
     navigateTo('goals');
+  };
+
+  const mealIcons = {
+    'Café da Manhã': <Coffee className="w-5 h-5 text-gray-600" />,
+    'Almoço': <UtensilsCrossed className="w-5 h-5 text-gray-600" />,
+    'Lanche da Tarde': <Cookie className="w-5 h-5 text-gray-600" />,
+    'Jantar': <Moon className="w-5 h-5 text-gray-600" />,
   };
 
   return (
@@ -77,7 +84,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-2xl">
-                  {['☕', '🍽️', '🥪', '🌙'][index]}
+                  {mealIcons[meal as keyof typeof mealIcons]}
                 </div>
                 <span className="text-base font-medium text-text-primary">
                   {meal}

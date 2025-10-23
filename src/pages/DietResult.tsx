@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 import { UserData } from '@/App'; // Importar a interface UserData do App.tsx
-import { Flame, Dumbbell, Wheat, Droplets, Droplet, Download, RefreshCcw } from 'lucide-react'; // Removido Circle, Square, Apple
+import { Flame, Dumbbell, Wheat, Droplets, Droplet, Download, RefreshCcw, Salad } from 'lucide-react'; // Adicionado Salad
 
 interface DietResultProps {
   userData: UserData;
@@ -164,7 +164,8 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
       {/* Dicas Alimentares */}
       <Card className="p-6 bg-tips-food-bg border border-tips-food-border rounded-lg mb-5">
         <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-          🥗 Dicas de Alimentação Saudável
+          <Salad className="w-5 h-5 text-primary" />
+          Dicas de Alimentação Saudável
         </h3>
         
         <div className="flex flex-col gap-3">
@@ -222,7 +223,8 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
       {/* Dicas de Hidratação */}
       <Card className="p-6 bg-tips-water-bg border border-tips-water-border rounded-lg mb-5">
         <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
-          💧 Dicas de Hidratação
+          <Droplet className="w-5 h-5 text-blue-500" />
+          Dicas de Hidratação
         </h3>
         
         <div className="flex flex-col gap-3">
