@@ -1,14 +1,16 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
-import { useUserData } from '@/context/UserDataContext';
-import { Flame, Dumbbell, Droplet, Download, RefreshCcw } from 'lucide-react'; // Removido Grain e Avocado
+import { UserData } from '@/App'; // Importar a interface UserData
+import { Flame, Dumbbell, Droplet, Download, RefreshCcw } from 'lucide-react';
 
-const DietResult: React.FC = () => {
-  const navigate = useNavigate();
-  const { userData, resetUserData } = useUserData();
+interface DietResultProps {
+  userData: UserData;
+  resetUserData: () => void;
+  navigateTo: (screen: string) => void;
+}
 
+const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, navigateTo }) => {
   // Placeholder data for PROMPT 1
   const dietPlan = userData.dietPlan || {
     totalCalories: 2300,
@@ -68,7 +70,7 @@ const DietResult: React.FC = () => {
 
   const handleNewDiet = () => {
     resetUserData();
-    navigate('/');
+    navigateTo('welcome');
   };
 
   return (

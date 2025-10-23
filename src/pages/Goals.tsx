@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
-import { useUserData } from '@/context/UserDataContext';
+import { UserData } from '@/App'; // Importar a interface UserData
 import { Scale, Dumbbell, Heart } from 'lucide-react';
 
-const Goals: React.FC = () => {
-  const navigate = useNavigate();
-  const { userData, updateUserData } = useUserData();
+interface GoalsProps {
+  userData: UserData;
+  updateUserData: (field: keyof UserData, value: any) => void;
+  navigateTo: (screen: string) => void;
+}
 
+const Goals: React.FC<GoalsProps> = ({ userData, updateUserData, navigateTo }) => {
   const [selectedGoal, setSelectedGoal] = useState<'Emagrecimento' | 'Ganho de Massa' | 'Manutenção' | null>(userData.goal);
 
   const handleContinue = () => {
     if (selectedGoal) {
       updateUserData('goal', selectedGoal);
-      navigate('/food-preferences');
+      navigateTo('foodPreferences');
     }
   };
 
@@ -74,7 +76,7 @@ const Goals: React.FC = () => {
         </div>
 
         <div className="flex justify-between mt-10">
-          <Button variant="secondary" onClick={() => navigate('/daily-routine')}>
+          <Button variant="secondary" onClick={() => navigateTo('dailyRoutine')}>
             Voltar
           </Button>
           <Button fullWidth={false} onClick={handleContinue} disabled={isButtonDisabled}>

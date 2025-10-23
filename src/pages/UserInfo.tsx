@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import ProgressBar from '@/components/ProgressBar';
-import { useUserData } from '@/context/UserDataContext';
+import { UserData } from '@/App'; // Importar a interface UserData
 import { validateWeight, validateAge, validateHeight } from '@/utils/validation';
 
-const UserInfo: React.FC = () => {
-  const navigate = useNavigate();
-  const { userData, updateUserData } = useUserData();
+interface UserInfoProps {
+  userData: UserData;
+  updateUserData: (field: keyof UserData, value: any) => void;
+  navigateTo: (screen: string) => void;
+}
 
+const UserInfo: React.FC<UserInfoProps> = ({ userData, updateUserData, navigateTo }) => {
   const [weight, setWeight] = useState<number | null>(userData.weight);
   const [age, setAge] = useState<number | null>(userData.age);
   const [height, setHeight] = useState<number | null>(userData.height);
@@ -48,7 +50,7 @@ const UserInfo: React.FC = () => {
       updateUserData('age', age);
       updateUserData('height', height);
       updateUserData('gender', gender);
-      navigate('/physical-activity');
+      navigateTo('physicalActivity');
     }
   };
 

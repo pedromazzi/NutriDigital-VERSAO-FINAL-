@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Input from '@/components/Input';
 import Accordion from '@/components/Accordion';
-import { useUserData } from '@/context/UserDataContext';
+import { UserData } from '@/App'; // Importar a interface UserData
 import { validateFoodPreferences } from '@/utils/validation';
 import { X, Search } from 'lucide-react';
+
+interface FoodPreferencesProps {
+  userData: UserData;
+  updateUserData: (field: keyof UserData, value: any) => void;
+  navigateTo: (screen: string) => void;
+}
 
 interface FoodCategory {
   name: string;
@@ -28,7 +33,7 @@ const mealCategories: { [key: string]: MealFoodCategories } = {
     proteins: { name: 'Proteínas', items: ['Ovos', 'Iogurte grego natural', 'Whey Protein em pó', 'Queijo Mussarela', 'Queijo Minas Frescal', 'Requeijão Light', 'Creme de Ricota Light', 'Queijo Cottage'], required: true },
     carbs: { name: 'Carboidratos', items: ['Batata doce', 'Aveia', 'Pão integral', 'Tapioca', 'Pão francês', 'Pão de forma', 'Cuscuz de Milho', 'Granola'], required: true },
     fruits: { name: 'Frutas', items: ['Maçã', 'Banana', 'Frutas vermelhas (mix)', 'Laranja', 'Abacaxi', 'Mamão', 'Morango', 'Melancia', 'Melão', 'Uva', 'Manga', 'Pera', 'Kiwi', 'Pêssego', 'Ameixa', 'Goiaba'], required: true },
-    laticinios: { name: 'Laticínios', items: ['Leite sem lactose', 'Leite de amêndoas', 'Leite Integral', 'Iogurte Natural Integral'] },
+    dairy: { name: 'Laticínios', items: ['Leite sem lactose', 'Leite de amêndoas', 'Leite Integral', 'Iogurte Natural Integral'] },
     fats: { name: 'Gorduras', items: ['Abacate', 'Azeite de oliva extra virgem', 'Castanhas (mix)', 'Sementes de chia', 'Sementes de girassol', 'Sementes de linhaça', 'Pasta de amendoim integral', 'Amêndoas'] },
   },
   lunch: {
@@ -41,7 +46,7 @@ const mealCategories: { [key: string]: MealFoodCategories } = {
     proteins: { name: 'Proteínas', items: ['Ovos', 'Iogurte grego natural', 'Whey Protein em pó', 'Queijo Mussarela', 'Queijo Minas Frescal', 'Requeijão Light', 'Creme de Ricota Light', 'Queijo Cottage'], required: true },
     carbs: { name: 'Carboidratos', items: ['Batata doce', 'Aveia', 'Pão integral', 'Tapioca', 'Pão francês', 'Pão de forma', 'Cuscuz de Milho', 'Granola'], required: true },
     fruits: { name: 'Frutas', items: ['Maçã', 'Banana', 'Frutas vermelhas (mix)', 'Laranja', 'Abacaxi', 'Mamão', 'Morango', 'Melancia', 'Melão', 'Uva', 'Manga', 'Pera', 'Kiwi', 'Pêssego', 'Ameixa', 'Goiaba'], required: true },
-    laticinios: { name: 'Laticínios', items: ['Leite sem lactose', 'Leite de amêndoas', 'Leite Integral', 'Iogurte Natural Integral'] },
+    dairy: { name: 'Laticínios', items: ['Leite sem lactose', 'Leite de amêndoas', 'Leite Integral', 'Iogurte Natural Integral'] },
     fats: { name: 'Gorduras', items: ['Abacate', 'Azeite de oliva extra virgem', 'Castanhas (mix)', 'Sementes de chia', 'Sementes de girassol', 'Sementes de linhaça', 'Pasta de amendoim integral', 'Amêndoas'] },
   },
   dinner: {
@@ -52,9 +57,7 @@ const mealCategories: { [key: string]: MealFoodCategories } = {
   },
 };
 
-const FoodPreferences: React.FC = () => {
-  const navigate = useNavigate();
-  const { userData, updateUserData } = useUserData();
+const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserData, navigateTo }) => {
   const [foodPreferences, setFoodPreferences] = useState(userData.foodPreferences);
   const [searchTerms, setSearchTerms] = useState<{ [key: string]: string }>({
     breakfast: '', lunch: '', snack: '', dinner: ''
@@ -143,7 +146,7 @@ const FoodPreferences: React.FC = () => {
 
   const handleGenerateDiet = () => {
     updateUserData('foodPreferences', foodPreferences);
-    navigate('/diet-result');
+    navigateTo('dietResult');
   };
 
   return (
@@ -238,7 +241,7 @@ const FoodPreferences: React.FC = () => {
         </div>
 
         <div className="flex justify-between mt-10">
-          <Button variant="secondary" onClick={() => navigate('/goals')}>
+          <Button variant="secondary" onClick={() => navigateTo('goals')}>
             Voltar
           </Button>
           <Button fullWidth={false} onClick={handleGenerateDiet} disabled={isGenerateButtonDisabled}>

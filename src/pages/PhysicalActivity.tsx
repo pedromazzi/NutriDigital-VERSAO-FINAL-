@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
-import { useUserData } from '@/context/UserDataContext';
+import { UserData } from '@/App'; // Importar a interface UserData
 
-const PhysicalActivity: React.FC = () => {
-  const navigate = useNavigate();
-  const { userData, updateUserData } = useUserData();
+interface PhysicalActivityProps {
+  userData: UserData;
+  updateUserData: (field: keyof UserData, value: any) => void;
+  navigateTo: (screen: string) => void;
+}
 
+const PhysicalActivity: React.FC<PhysicalActivityProps> = ({ userData, updateUserData, navigateTo }) => {
   const [practicesActivity, setPracticesActivity] = useState<boolean | null>(userData.practicesActivity);
   const [activityLevel, setActivityLevel] = useState<'Leve' | 'Moderado' | 'Intenso' | null>(userData.activityLevel);
   const [activityLevelError, setActivityLevelError] = useState('');
@@ -28,7 +30,7 @@ const PhysicalActivity: React.FC = () => {
     setActivityLevelError('');
     updateUserData('practicesActivity', practicesActivity);
     updateUserData('activityLevel', activityLevel);
-    navigate('/daily-routine');
+    navigateTo('dailyRoutine');
   };
 
   const isButtonDisabled = practicesActivity === true && !activityLevel;
@@ -94,7 +96,7 @@ const PhysicalActivity: React.FC = () => {
         )}
 
         <div className="flex justify-between mt-10">
-          <Button variant="secondary" onClick={() => navigate('/user-info')}>
+          <Button variant="secondary" onClick={() => navigateTo('userInfo')}>
             Voltar
           </Button>
           <Button variant="primary" onClick={handleAdvance} disabled={isButtonDisabled}>

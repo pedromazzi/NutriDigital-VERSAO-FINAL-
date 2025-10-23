@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import ProgressBar from '@/components/ProgressBar';
-import { useUserData } from '@/context/UserDataContext';
+import { UserData } from '@/App'; // Importar a interface UserData
 import { validateMealTimesOrder } from '@/utils/validation';
-import { Coffee, UtensilsCrossed, Sandwich, Soup } from 'lucide-react'; // Corrigido Utensils para UtensilsCrossed
+import { Coffee, UtensilsCrossed, Sandwich, Soup } from 'lucide-react';
 
-const DailyRoutine: React.FC = () => {
-  const navigate = useNavigate();
-  const { userData, updateUserData } = useUserData();
+interface DailyRoutineProps {
+  userData: UserData;
+  updateUserData: (field: keyof UserData, value: any) => void;
+  navigateTo: (screen: string) => void;
+}
 
+const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, navigateTo }) => {
   const [mealTimes, setMealTimes] = useState(userData.mealTimes);
   const [timeOrderError, setTimeOrderError] = useState('');
 
@@ -44,7 +46,7 @@ const DailyRoutine: React.FC = () => {
     }
 
     updateUserData('mealTimes', mealTimes);
-    navigate('/goals');
+    navigateTo('goals');
   };
 
   const isButtonDisabled = !Object.values(mealTimes).every(time => time !== '') || timeOrderError !== '';
@@ -75,7 +77,7 @@ const DailyRoutine: React.FC = () => {
             />
           </div>
           <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-            <UtensilsCrossed size={24} className="text-green-600" /> {/* Usando UtensilsCrossed */}
+            <UtensilsCrossed size={24} className="text-green-600" />
             <Input
               label="Almoço"
               type="time"
@@ -111,7 +113,7 @@ const DailyRoutine: React.FC = () => {
         {timeOrderError && <p className="text-red-500 text-xs mt-2 text-center">{timeOrderError}</p>}
 
         <div className="flex justify-between mt-10">
-          <Button variant="secondary" onClick={() => navigate('/physical-activity')}>
+          <Button variant="secondary" onClick={() => navigateTo('physicalActivity')}>
             Voltar
           </Button>
           <Button variant="primary" onClick={handleAdvance} disabled={isButtonDisabled}>
