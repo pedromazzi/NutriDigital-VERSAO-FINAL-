@@ -38,7 +38,7 @@ export interface UserData {
   height: number | null;
   gender: 'Masculino' | 'Feminino' | null;
   practicesActivity: boolean | null;
-  activityLevel: 'Leve' | 'Moderado' | 'Intenso' | null;
+  activityLevel: 'Sedentario' | 'Leve' | 'Moderado' | 'Intenso' | 'Muito Intenso' | null; // Atualizado aqui
   mealTimes: {
     breakfast: string;
     lunch: string;
