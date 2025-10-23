@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 import { UserData } from '@/App'; // Importar a interface UserData do App.tsx
-import { Flame, Dumbbell, Wheat, Droplets, Droplet, Download, RefreshCcw, Circle, Square, Apple } from 'lucide-react'; // Importar ícones Lucide
+import { Flame, Dumbbell, Wheat, Droplets, Droplet, Download, RefreshCcw } from 'lucide-react'; // Removido Circle, Square, Apple
 
 interface DietResultProps {
   userData: UserData;
@@ -26,9 +26,9 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
         time: userData?.mealTimes?.breakfast || '09:00',
         calories: 400,
         foods: [
-          { emoji: '🥚', quantity: '2 unidades', name: 'ovos', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> },
-          { emoji: '🍞', quantity: '2 fatias', name: 'pão integral', icon: <Square className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> },
-          { emoji: '🍌', quantity: '1 unidade', name: 'banana', icon: <Apple className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> }
+          { emoji: '🥚', quantity: '2 unidades', name: 'ovos' },
+          { emoji: '🍞', quantity: '2 fatias', name: 'pão integral' },
+          { emoji: '🍌', quantity: '1 unidade', name: 'banana' }
         ]
       },
       {
@@ -36,9 +36,9 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
         time: userData?.mealTimes?.lunch || '12:00',
         calories: 650,
         foods: [
-          { emoji: '🍚', quantity: '250g', name: 'arroz branco cozido', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> },
-          { emoji: '🍗', quantity: '150g', name: 'peito de frango', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> },
-          { emoji: '🫒', quantity: '10ml', name: 'azeite de oliva', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> }
+          { emoji: '🍚', quantity: '250g', name: 'arroz branco cozido' },
+          { emoji: '🍗', quantity: '150g', name: 'peito de frango' },
+          { emoji: '🫒', quantity: '10ml', name: 'azeite de oliva' }
         ]
       },
       {
@@ -46,9 +46,9 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
         time: userData?.mealTimes?.snack || '16:00',
         calories: 300,
         foods: [
-          { emoji: '💪', quantity: '30g', name: 'whey protein', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> },
-          { emoji: '🥛', quantity: '200ml', name: 'leite integral', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> },
-          { emoji: '🍓', quantity: '100g', name: 'morango', icon: <Apple className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> }
+          { emoji: '💪', quantity: '30g', name: 'whey protein' },
+          { emoji: '🥛', quantity: '200ml', name: 'leite integral' },
+          { emoji: '🍓', quantity: '100g', name: 'morango' }
         ]
       },
       {
@@ -56,9 +56,9 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
         time: userData?.mealTimes?.dinner || '19:00',
         calories: 650,
         foods: [
-          { emoji: '🐟', quantity: '150g', name: 'salmão', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> },
-          { emoji: '🥔', quantity: '200g', name: 'batata doce', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> },
-          { emoji: '🥬', quantity: 'à gosto', name: 'vegetais', icon: <Circle className="w-4 h-4 fill-primary text-primary flex-shrink-0" /> }
+          { emoji: '🐟', quantity: '150g', name: 'salmão' },
+          { emoji: '🥔', quantity: '200g', name: 'batata doce' },
+          { emoji: '🥬', quantity: 'à gosto', name: 'vegetais' }
         ]
       }
     ]
@@ -146,16 +146,13 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
               </div>
 
               {/* Lista de alimentos */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
                 {meal.foods.map((food, foodIndex) => (
-                  <div
+                  <div 
                     key={foodIndex}
-                    className="flex items-center gap-2 text-sm text-text-primary"
+                    className="text-sm text-text-primary py-1"
                   >
-                    {food.icon}
-                    <span>
-                      <strong className="font-medium">{food.quantity}</strong> {food.name}
-                    </span>
+                    <span className="font-medium">{food.quantity}</span> {food.name}
                   </div>
                 ))}
               </div>
