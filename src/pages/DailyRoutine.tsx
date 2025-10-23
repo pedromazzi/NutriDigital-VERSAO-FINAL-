@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
-import Input from '@/components/Input';
 import ProgressBar from '@/components/ProgressBar';
-import Card from '@/components/Card'; // Importar o componente Card
 import { UserData } from '@/App'; // Importar a interface UserData
 import { validateMealTimesOrder } from '@/utils/validation';
-import { Coffee, UtensilsCrossed, Sandwich, Soup } from 'lucide-react';
 
 interface DailyRoutineProps {
   userData: UserData;
@@ -64,64 +61,84 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
         Defina os horários para suas refeições diárias para um plano de dieta mais preciso.
       </p>
 
+      {/* Grid de Horários */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 w-full">
-        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-gray-200 shadow-card">
-          <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-2xl">
-            <Coffee size={24} className="text-primary" />
+        {/* Café da Manhã */}
+        <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
+              ☕
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Café da Manhã
+            </h3>
           </div>
-          <Input
-            label="Café da Manhã"
+          <input
             type="time"
             value={mealTimes.breakfast}
             onChange={(e) => handleTimeChange('breakfast', e.target.value)}
-            className="flex-grow"
-            labelClassName="sr-only" // Hide label visually, but keep for accessibility
+            className="w-full px-3 py-3 text-base border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
-        </Card>
-        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-gray-200 shadow-card">
-          <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-2xl">
-            <UtensilsCrossed size={24} className="text-primary" />
+        </div>
+
+        {/* Almoço */}
+        <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
+              🍽️
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Almoço
+            </h3>
           </div>
-          <Input
-            label="Almoço"
+          <input
             type="time"
             value={mealTimes.lunch}
             onChange={(e) => handleTimeChange('lunch', e.target.value)}
-            className="flex-grow"
-            labelClassName="sr-only"
+            className="w-full px-3 py-3 text-base border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
-        </Card>
-        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-gray-200 shadow-card">
-          <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-2xl">
-            <Sandwich size={24} className="text-primary" />
+        </div>
+
+        {/* Lanche da Tarde */}
+        <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
+              🥪
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Lanche da Tarde
+            </h3>
           </div>
-          <Input
-            label="Lanche da Tarde"
+          <input
             type="time"
             value={mealTimes.snack}
             onChange={(e) => handleTimeChange('snack', e.target.value)}
-            className="flex-grow"
-            labelClassName="sr-only"
+            className="w-full px-3 py-3 text-base border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
-        </Card>
-        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-gray-200 shadow-card">
-          <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-2xl">
-            <Soup size={24} className="text-primary" />
+        </div>
+
+        {/* Jantar */}
+        <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">
+              🌙
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Jantar
+            </h3>
           </div>
-          <Input
-            label="Jantar"
+          <input
             type="time"
             value={mealTimes.dinner}
             onChange={(e) => handleTimeChange('dinner', e.target.value)}
-            className="flex-grow"
-            labelClassName="sr-only"
+            className="w-full px-3 py-3 text-base border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
-        </Card>
+        </div>
       </div>
       {timeOrderError && <p className="text-red-500 text-sm mt-2 text-center">{timeOrderError}</p>}
 
       {/* Dica sobre Rotina */}
-      <Card className="p-5 bg-tips-general-bg border border-tips-general-border rounded-lg mb-8 w-full">
+      <div className="p-5 bg-tips-general-bg border border-tips-general-border rounded-lg mb-8 w-full">
         <div className="flex gap-3 items-start">
           <span className="text-2xl">💡</span>
           <div>
@@ -133,7 +150,7 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
             </p>
           </div>
         </div>
-      </Card>
+      </div>
 
       <div className="flex gap-3 mt-10 w-full">
         <Button variant="secondary" onClick={() => navigateTo('physicalActivity')} className="flex-1 py-3.5">
