@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 import { useUserData } from '@/context/UserDataContext';
-import { Flame, Dumbbell, Grain, Avocado, Droplet, Download, RefreshCcw } from 'lucide-react';
+import { Flame, Dumbbell, Droplet, Download, RefreshCcw } from 'lucide-react'; // Removido Grain e Avocado
 
 const DietResult: React.FC = () => {
   const navigate = useNavigate();
@@ -92,12 +92,12 @@ const DietResult: React.FC = () => {
             <span className="font-bold text-lg text-gray-800">{dietPlan.totalProtein}g</span>
           </Card>
           <Card className="flex flex-col items-center p-4 bg-white border border-gray-200">
-            <Grain size={24} className="text-pink-500 mb-2" />
+            <span className="text-pink-500 mb-2 text-2xl">🌾</span> {/* Substituído por emoji */}
             <span className="text-sm text-gray-600">Carboidratos</span>
             <span className="font-bold text-lg text-gray-800">{dietPlan.totalCarbs}g</span>
           </Card>
           <Card className="flex flex-col items-center p-4 bg-white border border-gray-200">
-            <Avocado size={24} className="text-yellow-600 mb-2" />
+            <span className="text-yellow-600 mb-2 text-2xl">🥑</span> {/* Substituído por emoji */}
             <span className="text-sm text-gray-600">Gordura</span>
             <span className="font-bold text-lg text-gray-800">{dietPlan.totalFat}g</span>
           </Card>

@@ -5,7 +5,7 @@ import Input from '@/components/Input';
 import ProgressBar from '@/components/ProgressBar';
 import { useUserData } from '@/context/UserDataContext';
 import { validateMealTimesOrder } from '@/utils/validation';
-import { Coffee, Utensils, Sandwich, Soup } from 'lucide-react';
+import { Coffee, UtensilsCrossed, Sandwich, Soup } from 'lucide-react'; // Corrigido Utensils para UtensilsCrossed
 
 const DailyRoutine: React.FC = () => {
   const navigate = useNavigate();
@@ -75,7 +75,7 @@ const DailyRoutine: React.FC = () => {
             />
           </div>
           <div className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-            <Utensils size={24} className="text-green-600" />
+            <UtensilsCrossed size={24} className="text-green-600" /> {/* Usando UtensilsCrossed */}
             <Input
               label="Almoço"
               type="time"
