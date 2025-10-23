@@ -1,22 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ["class"], // Mantendo o darkMode existente
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "./pages/**/*.{ts,tsx}", // Mantendo as configurações de conteúdo existentes
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
   ],
-  prefix: "", // Mantendo o prefixo existente
   theme: {
-    container: { // Mantendo a configuração de container existente
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
       colors: {
         // Cores Primárias
@@ -59,10 +47,9 @@ export default {
         bg: {
           primary: '#FAFAFA',
           secondary: '#F5F5F5',
-          white: '#FFFFFF',
         },
-        // Cores de Border
-        border: {
+        // Cores de Borda (CORRIGIDO - sem conflito)
+        'border-gray': {
           light: '#E5E5E5',
           medium: '#D4D4D4',
         },
@@ -107,30 +94,7 @@ export default {
         'card': '0 2px 8px rgba(0, 0, 0, 0.05)',
         'card-hover': '0 4px 12px rgba(0, 210, 106, 0.15)',
       },
-      // Mantendo keyframes e animations existentes
-      keyframes: {
-        "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
-        },
-        "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
     },
   },
-  plugins: [require("tailwindcss-animate")], // Mantendo plugins existentes
+  plugins: [],
 }

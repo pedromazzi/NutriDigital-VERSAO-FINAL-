@@ -65,7 +65,7 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8 w-full">
-        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-border-light shadow-card">
+        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-gray-200 shadow-card"> {/* Alterado de border-border-light para border-gray-200 */}
           <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-2xl">
             <Coffee size={24} className="text-primary" />
           </div>
@@ -78,7 +78,7 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
             labelClassName="sr-only" // Hide label visually, but keep for accessibility
           />
         </Card>
-        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-border-light shadow-card">
+        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-gray-200 shadow-card"> {/* Alterado de border-border-light para border-gray-200 */}
           <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-2xl">
             <UtensilsCrossed size={24} className="text-primary" />
           </div>
@@ -91,7 +91,7 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
             labelClassName="sr-only"
           />
         </Card>
-        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-border-light shadow-card">
+        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-gray-200 shadow-card"> {/* Alterado de border-border-light para border-gray-200 */}
           <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-2xl">
             <Sandwich size={24} className="text-primary" />
           </div>
@@ -104,7 +104,7 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
             labelClassName="sr-only"
           />
         </Card>
-        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-border-light shadow-card">
+        <Card className="flex items-center gap-3 p-5 bg-white rounded-lg border border-gray-200 shadow-card"> {/* Alterado de border-border-light para border-gray-200 */}
           <div className="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-2xl">
             <Soup size={24} className="text-primary" />
           </div>

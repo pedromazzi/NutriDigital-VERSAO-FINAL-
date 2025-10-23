@@ -23,7 +23,7 @@ const Input: React.FC<InputProps> = ({ label, error, suffix, className, id, labe
           id={inputId}
           className={cn(
             'w-full px-3 py-3 text-base border rounded-lg transition-colors',
-            error ? 'border-red-500' : 'border-border-light',
+            error ? 'border-red-500' : 'border-gray-200', // Alterado de border-border-light para border-gray-200
             'focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20',
             suffix ? 'pr-12' : '',
           )}
