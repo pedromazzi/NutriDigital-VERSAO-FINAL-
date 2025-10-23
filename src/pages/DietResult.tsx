@@ -130,30 +130,108 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
           ))}
         </div>
 
-        {/* Seções Informativas */}
-        <div className="space-y-4 mb-8">
-          <Card className="p-4 bg-green-50 border-green-200">
-            <h3 className="font-bold text-green-800 mb-2">🥗 Dicas de Alimentação Saudável</h3>
-            <p className="text-sm text-green-700 whitespace-pre-line">
-              • Mastigue devagar - Comer com calma melhora a digestão, aumenta a saciedade e ajuda a evitar exageros.
-              • Inclua fibras diariamente - Frutas com casca, vegetais e grãos integrais ajudam no funcionamento do intestino e no controle do apetite.
-              • Planeje suas refeições - Manter opções saudáveis à mão evita decisões impulsivas e facilita seguir a dieta.
-              • Cuidado com o açúcar oculto - Molhos, sucos e barrinhas "fit" podem esconder açúcar — leia sempre os rótulos.
-              • Não pule refeições - Isso pode causar queda de energia e aumentar a fome nas próximas refeições.
-              • Inclua boas gorduras - Abacate, azeite e castanhas são aliados da saciedade e da saúde do coração.
-              • Quanto mais colorido, melhor! - Um prato cheio de vegetais de cores variadas garante uma boa combinação de vitaminas, minerais e antioxidantes. 🌈 Não se esqueça de incluí-los todos os dias!
-            </p>
-          </Card>
-          <Card className="p-4 bg-blue-50 border-blue-200">
-            <h3 className="font-bold text-blue-800 mb-2">💧 Dicas de Hidratação</h3>
-            <p className="text-sm text-blue-700 whitespace-pre-line">
-              • Comece o dia com água - Beber um copo logo ao acordar ajuda o corpo a se reidratar e desperta o metabolismo.
-              • Leve sua garrafinha - Ter água por perto faz toda diferença para manter a ingestão regular.
-              • Observe sua urina - Um bom sinal de hidratação é a cor: quanto mais clara, melhor.
-              • Beba aos poucos - Pequenos goles ao longo do dia são mais eficazes do que grandes quantidades de uma só vez.
-              • Transforme em hábito - Criar uma rotina de hidratação mantém corpo e mente em equilíbrio diariamente.
-            </p>
-          </Card>
+        {/* Dicas Alimentares */}
+        <Card className="p-6 bg-green-50 border-green-200 mb-5">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            🥗 Dicas de Alimentação Saudável
+          </h3>
+          
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-3 items-start">
+              <span className="text-green-600 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Mastigue devagar.</strong> Comer com calma melhora a digestão, aumenta a saciedade e ajuda a evitar exageros.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-green-600 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Inclua fibras diariamente.</strong> Frutas com casca, vegetais e grãos integrais ajudam no funcionamento do intestino e no controle do apetite.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-green-600 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Planeje suas refeições.</strong> Manter opções saudáveis à mão evita decisões impulsivas e facilita seguir a dieta.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-green-600 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Cuidado com o açúcar oculto.</strong> Molhos, sucos e barrinhas "fit" podem esconder açúcar — leia sempre os rótulos.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-green-600 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Não pule refeições.</strong> Isso pode causar queda de energia e aumentar a fome nas próximas refeições.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-green-600 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Inclua boas gorduras.</strong> Abacate, azeite e castanhas são aliados da saciedade e da saúde do coração.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-green-600 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Quanto mais colorido, melhor!</strong> Um prato cheio de vegetais de cores variadas garante uma boa combinação de vitaminas, minerais e antioxidantes. 🌈 Não se esqueça de incluí-los todos os dias!
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Dicas de Hidratação */}
+        <Card className="p-6 bg-blue-50 border-blue-200 mb-5">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            💧 Dicas de Hidratação
+          </h3>
+          
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-3 items-start">
+              <span className="text-blue-500 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Comece o dia com água.</strong> Beber um copo logo ao acordar ajuda o corpo a se reidratar e desperta o metabolismo.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-blue-500 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Leve sua garrafinha.</strong> Ter água por perto faz toda diferença para manter a ingestão regular.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-blue-500 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Observe sua urina.</strong> Um bom sinal de hidratação é a cor: quanto mais clara, melhor.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-blue-500 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Beba aos poucos.</strong> Pequenos goles ao longo do dia são mais eficazes do que grandes quantidades de uma só vez.
+              </p>
+            </div>
+
+            <div className="flex gap-3 items-start">
+              <span className="text-blue-500 text-lg flex-shrink-0">•</span>
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                <strong>Transforme em hábito.</strong> Criar uma rotina de hidratação mantém corpo e mente em equilíbrio diariamente.
+              </p>
+            </div>
+          </div>
+        </Card>
+
           <Card className="p-4 bg-gray-100 border-gray-200">
             <h3 className="font-bold text-gray-800 mb-2">Disclaimer</h3>
             <p className="text-sm text-gray-700">
