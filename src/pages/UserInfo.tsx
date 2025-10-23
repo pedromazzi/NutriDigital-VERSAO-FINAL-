@@ -113,7 +113,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ userData, updateUserData, navigateT
             <label
               className={cn(
                 "p-4 border rounded-lg cursor-pointer text-base font-medium text-text-primary text-center",
-                gender === 'Masculino' ? 'border-primary bg-primary-light border-2' : 'border-gray-200 hover:border-primary/50' // Alterado de border-border-light para border-gray-200
+                gender === 'Masculino' ? 'border-primary bg-primary-light border-2' : 'border-gray-200 hover:border-primary/50'
               )}
             >
               <input
@@ -129,7 +129,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ userData, updateUserData, navigateT
             <label
               className={cn(
                 "p-4 border rounded-lg cursor-pointer text-base font-medium text-text-primary text-center",
-                gender === 'Feminino' ? 'border-primary bg-primary-light border-2' : 'border-gray-200 hover:border-primary/50' // Alterado de border-border-light para border-gray-200
+                gender === 'Feminino' ? 'border-primary bg-primary-light border-2' : 'border-gray-200 hover:border-primary/50'
               )}
             >
               <input

@@ -73,7 +73,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
           {['Café da Manhã', 'Almoço', 'Lanche da Tarde', 'Jantar'].map((meal, index) => (
             <Card 
               key={index}
-              className="bg-white border border-gray-200 rounded-lg p-5 flex justify-between items-center opacity-60" // Alterado de border-border-light para border-gray-200
+              className="bg-white border border-gray-200 rounded-lg p-5 flex justify-between items-center opacity-60"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-2xl">

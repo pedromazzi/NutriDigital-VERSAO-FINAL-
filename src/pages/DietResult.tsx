@@ -94,7 +94,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {/* Calorias */}
-          <Card className="flex flex-col items-center p-5 bg-white border border-gray-200 text-center"> {/* Alterado de border-border-light para border-gray-200 */}
+          <Card className="flex flex-col items-center p-5 bg-white border border-gray-200 text-center">
             <Flame size={32} className="text-orange-500 mb-2" />
             <span className="text-sm text-text-secondary">Calorias</span>
             <span className="font-bold text-2xl text-text-primary">{dietPlan.dailySummary.calories} kcal</span>
@@ -134,7 +134,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
       <div className="mb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {dietPlan.meals.map((meal, index) => (
-            <Card key={index} className="p-5 bg-white border border-gray-200"> {/* Alterado de border-border-light para border-gray-200 */}
+            <Card key={index} className="p-5 bg-white border border-gray-200">
               {/* Header da refeição */}
               <div className="mb-4 pb-3 border-b border-gray-100">
                 <h4 className="text-lg font-semibold text-text-primary mb-1">
@@ -267,7 +267,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
       </Card>
 
       {/* Disclaimer */}
-      <Card className="p-5 bg-bg-secondary border border-gray-200 rounded-lg mb-8"> {/* Alterado de border-border-light para border-gray-200 */}
+      <Card className="p-5 bg-bg-secondary border border-gray-200 rounded-lg mb-8">
         <h3 className="font-semibold text-base text-text-primary mb-2">Disclaimer</h3>
         <p className="text-xs text-text-secondary leading-relaxed">
           Este plano alimentar é uma sugestão e deve ser adaptado às suas necessidades individuais. Consulte sempre um profissional de saúde ou nutricionista antes de iniciar qualquer nova dieta.

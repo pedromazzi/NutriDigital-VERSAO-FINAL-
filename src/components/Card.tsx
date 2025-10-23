@@ -19,20 +19,20 @@ const Card: React.FC<CardProps> = ({
   const baseClasses = 'rounded-lg transition-all duration-200';
   
   const variants = {
-    default: 'bg-white border border-gray-200', // Alterado de border-border-light para border-gray-200
+    default: 'bg-white border border-gray-200',
     outlined: selected 
       ? 'bg-primary-light border-2 border-primary' 
-      : 'bg-white border border-gray-200 hover:border-primary/50', // Alterado de border-border-light para border-gray-200
+      : 'bg-white border border-gray-200 hover:border-primary/50',
     elevated: selected
       ? 'bg-primary-light border-2 border-primary shadow-card-hover transform -translate-y-0.5'
-      : 'bg-white border border-gray-200 shadow-card hover:shadow-card-hover', // Alterado de border-border-light para border-gray-200
+      : 'bg-white border border-gray-200 shadow-card hover:shadow-card-hover',
     // Mantendo as variantes 'goal' e 'food-category' para compatibilidade, mas mapeando para 'outlined' ou 'elevated' se necessário
     goal: selected 
       ? 'bg-primary-light border-2 border-primary shadow-card-hover transform -translate-y-0.5' 
-      : 'bg-white border border-gray-200 shadow-card hover:shadow-card-hover', // Alterado de border-border-light para border-gray-200
+      : 'bg-white border border-gray-200 shadow-card hover:shadow-card-hover',
     'food-category': selected 
       ? 'bg-primary-light border-2 border-primary shadow-card-hover transform -translate-y-0.5' 
-      : 'bg-white border border-gray-200 shadow-card hover:shadow-card-hover', // Alterado de border-border-light para border-gray-200
+      : 'bg-white border border-gray-200 shadow-card hover:shadow-card-hover',
   };
 
   const clickableClasses = onClick ? 'cursor-pointer' : '';
