@@ -23,11 +23,18 @@ interface MealPreferences {
   legumes?: string[];
 }
 
-interface FoodPreferences {
+interface FoodPreferencesData { // Renomeado para evitar conflito com o componente
   breakfast: MealPreferences;
   lunch: MealPreferences;
   snack: MealPreferences;
   dinner: MealPreferences;
+}
+
+interface SelectedCategories {
+  breakfast: string[];
+  lunch: string[];
+  snack: string[];
+  dinner: string[];
 }
 
 export interface UserData {
@@ -38,7 +45,7 @@ export interface UserData {
   height: number | null;
   gender: 'Masculino' | 'Feminino' | null;
   practicesActivity: boolean | null;
-  activityLevel: 'Sedentario' | 'Leve' | 'Moderado' | 'Intenso' | 'Muito Intenso' | null; // Atualizado aqui
+  activityLevel: 'Sedentario' | 'Leve' | 'Moderado' | 'Intenso' | 'Muito Intenso' | null;
   mealTimes: {
     breakfast: string;
     lunch: string;
@@ -46,7 +53,9 @@ export interface UserData {
     dinner: string;
   };
   goal: 'Emagrecimento' | 'Ganho de Massa' | 'Manutenção' | null;
-  foodPreferences: FoodPreferences;
+  foodPreferences: FoodPreferencesData; // Usando o tipo renomeado
+  selectedCategories: SelectedCategories; // Adicionado para persistência das categorias selecionadas
+  intolerances: string[]; // Adicionado para persistência das intolerâncias
   dietPlan: any | null;
 }
 
@@ -94,6 +103,13 @@ const initialState: UserData = {
       fats: []
     }
   },
+  selectedCategories: { // Inicializando com arrays vazios
+    breakfast: [],
+    lunch: [],
+    snack: [],
+    dinner: []
+  },
+  intolerances: [], // Inicializando com array vazio
   dietPlan: null
 };
 

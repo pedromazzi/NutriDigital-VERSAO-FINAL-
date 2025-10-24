@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Coffee, UtensilsCrossed, Cookie, Moon, Check } from 'lucide-react';
+import { Coffee, UtensilsCrossed, Cookie, Moon, Check, AlertCircle } from 'lucide-react';
 import Button from '@/components/Button'; // Importar o componente Button
 import ProgressBar from '@/components/ProgressBar'; // Importar o componente ProgressBar
+import Card from '@/components/Card'; // Importar o componente Card
 
 interface UserData {
   userName?: string;
@@ -11,8 +12,8 @@ interface UserData {
     snack?: string;
     dinner?: string;
   };
-  // Adicionar selectedCategories ao UserData para persistência
-  selectedCategories?: SelectedCategories; 
+  selectedCategories?: SelectedCategories; // Adicionado para persistência
+  intolerances?: string[]; // Adicionado para persistência
 }
 
 interface FoodPreferencesProps {
@@ -38,9 +39,10 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
       dinner: []
     }
   );
+  const [intolerances, setIntolerances] = useState<string[]>(userData.intolerances || []); // Inicializa com dados existentes ou vazio
   const [isLoading, setIsLoading] = useState(false);
 
-  // Definição das refeições e categorias
+  // Definição das refeições e categorias (CORRIGIDO)
   const meals = [
     {
       id: 'breakfast',
@@ -48,7 +50,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
       shortName: 'Café',
       time: userData?.mealTimes?.breakfast || '09:00',
       icon: Coffee,
-      categories: ['Proteínas', 'Carboidratos', 'Frutas', 'Bebidas']
+      categories: ['Proteínas', 'Carboidratos', 'Frutas', 'Laticínios', 'Gorduras Boas']
     },
     {
       id: 'lunch',
@@ -56,7 +58,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
       shortName: 'Almoço',
       time: userData?.mealTimes?.lunch || '12:00',
       icon: UtensilsCrossed,
-      categories: ['Proteínas', 'Carboidratos', 'Vegetais', 'Acompanhamentos']
+      categories: ['Proteínas', 'Carboidratos', 'Vegetais', 'Leguminosas', 'Gorduras Boas']
     },
     {
       id: 'snack',
@@ -64,7 +66,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
       shortName: 'Lanche',
       time: userData?.mealTimes?.snack || '16:00',
       icon: Cookie,
-      categories: ['Proteínas', 'Carboidratos', 'Frutas']
+      categories: ['Proteínas', 'Carboidratos', 'Frutas', 'Laticínios', 'Gorduras Boas']
     },
     {
       id: 'dinner',
@@ -72,7 +74,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
       shortName: 'Jantar',
       time: userData?.mealTimes?.dinner || '19:00',
       icon: Moon,
-      categories: ['Proteínas', 'Carboidratos', 'Vegetais']
+      categories: ['Proteínas', 'Carboidratos', 'Vegetais', 'Leguminosas', 'Gorduras Boas']
     }
   ];
 
@@ -89,6 +91,15 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
           ? mealCategories.filter(c => c !== category)
           : [...mealCategories, category]
       };
+    });
+  };
+
+  const toggleIntolerance = (intolerance: string) => {
+    setIntolerances(prev => {
+      if (prev.includes(intolerance)) {
+        return prev.filter(i => i !== intolerance);
+      }
+      return [...prev, intolerance];
     });
   };
 
@@ -115,7 +126,10 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
     }
 
     setIsLoading(true);
-    updateUserData('foodPreferences', selectedCategories); // Atualiza foodPreferences com as categorias selecionadas
+    
+    // Salvar dados
+    updateUserData('selectedCategories', selectedCategories);
+    updateUserData('intolerances', intolerances);
 
     setTimeout(() => {
       setIsLoading(false);
@@ -163,6 +177,63 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
           </div>
         </div>
       </div>
+
+      {/* NOVO: Seção de Intolerâncias */}
+      <Card className="p-6 mb-6"> {/* Usando o componente Card */}
+        <div className="flex items-start gap-3 mb-4">
+          <AlertCircle className="w-5 h-5 text-secondary-orange flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="font-semibold text-text-primary mb-1">
+              Possui alguma intolerância alimentar?
+            </h3>
+            <p className="text-sm text-text-secondary">
+              Selecione suas intolerâncias para que possamos excluir esses alimentos da sua dieta.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => toggleIntolerance('gluten')}
+            className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+              intolerances.includes('gluten')
+                ? 'border-secondary-orange bg-secondary-orange-light'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className={`font-medium ${
+                intolerances.includes('gluten') ? 'text-secondary-orange' : 'text-text-primary'
+              }`}>
+                Glúten
+              </span>
+              {intolerances.includes('gluten') && (
+                <Check className="w-5 h-5 text-secondary-orange" />
+              )}
+            </div>
+          </button>
+
+          <button
+            onClick={() => toggleIntolerance('lactose')}
+            className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+              intolerances.includes('lactose')
+                ? 'border-secondary-orange bg-secondary-orange-light'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <span className={`font-medium ${
+                intolerances.includes('lactose') ? 'text-secondary-orange' : 'text-text-primary'
+              }`}>
+                Lactose
+              </span>
+              {intolerances.includes('lactose') && (
+                <Check className="w-5 h-5 text-secondary-orange" />
+              )}
+            </div>
+          </button>
+        </div>
+      </Card>
 
       {/* TABS - Abas das Refeições */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm mb-8">
