@@ -186,28 +186,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
           <div className="flex gap-2 sm:gap-3 items-start">
             <span className="text-primary text-base sm:text-lg flex-shrink-0">•</span>
             <p className="m-0 text-xs sm:text-sm leading-relaxed text-text-secondary">
-              <strong>Planeje suas refeições.</strong> Manter opções saudáveis à mão evita decisões impulsivas e facilita seguir a dieta.
-            </p>
-          </div>
-
-          <div className="flex gap-2 sm:gap-3 items-start">
-            <span className="text-primary text-base sm:text-lg flex-shrink-0">•</span>
-            <p className="m-0 text-xs sm:text-sm leading-relaxed text-text-secondary">
-              <strong>Cuidado com o açúcar oculto.</strong> Molhos, sucos e barrinhas "fit" podem esconder açúcar — leia sempre os rótulos.
-            </p>
-          </div>
-
-          <div className="flex gap-2 sm:gap-3 items-start">
-            <span className="text-primary text-base sm:text-lg flex-shrink-0">•</span>
-            <p className="m-0 text-xs sm:text-sm leading-relaxed text-text-secondary">
               <strong>Não pule refeições.</strong> Isso pode causar queda de energia e aumentar a fome nas próximas refeições.
-            </p>
-          </div>
-
-          <div className="flex gap-2 sm:gap-3 items-start">
-            <span className="text-primary text-base sm:text-lg flex-shrink-0">•</span>
-            <p className="m-0 text-xs sm:text-sm leading-relaxed text-text-secondary">
-              <strong>Inclua boas gorduras.</strong> Abacate, azeite e castanhas são aliados da saciedade e da saúde do coração.
             </p>
           </div>
 
