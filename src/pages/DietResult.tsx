@@ -87,45 +87,46 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
         </p>
       </div>
 
-      {/* Resumo Diário */}
-      <div className="mb-6 sm:mb-10">
-        <h3 className="text-lg sm:text-xl font-semibold text-text-primary mb-3 sm:mb-5">
+      {/* Seção Resumo Diário */}
+      <div className="mb-6 sm:mb-8">
+        <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4">
           Resumo Diário
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          {/* Calorias */}
-          <Card className="flex flex-col items-center p-3 sm:p-5 bg-white border border-gray-200 text-center">
-            <Flame className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500 mb-1 sm:mb-2" />
-            <span className="text-xs sm:text-sm text-text-secondary">Calorias</span>
-            <span className="font-bold text-xl sm:text-2xl text-text-primary">{dietPlan.dailySummary.calories} kcal</span>
+
+        <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-8">
+          {/* Card 1 - Calorias */}
+          <Card className="flex flex-col items-center p-2.5 sm:p-4 bg-white border border-gray-200 text-center">
+            <Flame className="w-5 sm:w-8 h-5 sm:h-8 text-orange-500 mb-1 sm:mb-2" />
+            <span className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Calorias</span>
+            <span className="text-base sm:text-2xl font-bold text-text-primary">{dietPlan.dailySummary.calories} kcal</span>
           </Card>
 
-          {/* Proteína */}
-          <Card className="flex flex-col items-center p-3 sm:p-5 bg-macro-protein-light border border-primary text-center">
-            <Dumbbell className="w-6 h-6 sm:w-8 sm:h-8 text-primary mb-1 sm:mb-2" />
-            <span className="text-xs sm:text-sm text-text-secondary">Proteína</span>
-            <span className="font-bold text-xl sm:text-2xl text-primary">{dietPlan.dailySummary.protein}g</span>
+          {/* Card 2 - Proteína */}
+          <Card className="flex flex-col items-center p-2.5 sm:p-4 bg-macro-protein-light border border-primary text-center">
+            <Dumbbell className="w-5 sm:w-8 h-5 sm:h-8 text-primary mb-1 sm:mb-2" />
+            <span className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Proteína</span>
+            <span className="text-base sm:text-2xl font-bold text-primary">{dietPlan.dailySummary.protein}g</span>
           </Card>
 
-          {/* Carboidratos */}
-          <Card className="flex flex-col items-center p-3 sm:p-5 bg-macro-carbs-light border border-macro-carbs text-center">
-            <Wheat className="w-6 h-6 sm:w-8 sm:h-8 text-macro-carbs mb-1 sm:mb-2" />
-            <span className="text-xs sm:text-sm text-text-secondary">Carboidratos</span>
-            <span className="font-bold text-xl sm:text-2xl text-macro-carbs">{dietPlan.dailySummary.carbs}g</span>
+          {/* Card 3 - Carboidratos */}
+          <Card className="flex flex-col items-center p-2.5 sm:p-4 bg-macro-carbs-light border border-macro-carbs text-center">
+            <Wheat className="w-5 sm:w-8 h-5 sm:h-8 text-macro-carbs mb-1 sm:mb-2" />
+            <span className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Carboidratos</span>
+            <span className="text-base sm:text-2xl font-bold text-macro-carbs">{dietPlan.dailySummary.carbs}g</span>
           </Card>
 
-          {/* Gordura */}
-          <Card className="flex flex-col items-center p-3 sm:p-5 bg-macro-fats-light border border-macro-fats text-center">
-            <Droplets className="w-6 h-6 sm:w-8 sm:h-8 text-macro-fats mb-1 sm:mb-2" />
-            <span className="text-xs sm:text-sm text-text-secondary">Gordura</span>
-            <span className="font-bold text-xl sm:text-2xl text-macro-fats">{dietPlan.dailySummary.fats}g</span>
+          {/* Card 4 - Gordura */}
+          <Card className="flex flex-col items-center p-2.5 sm:p-4 bg-macro-fats-light border border-macro-fats text-center">
+            <Droplets className="w-5 sm:w-8 h-5 sm:h-8 text-macro-fats mb-1 sm:mb-2" />
+            <span className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Gordura</span>
+            <span className="text-base sm:text-2xl font-bold text-macro-fats">{dietPlan.dailySummary.fats}g</span>
           </Card>
 
-          {/* Água */}
-          <Card className="flex flex-col items-center p-3 sm:p-5 bg-macro-water-light border border-macro-water text-center">
-            <Droplet className="w-6 h-6 sm:w-8 sm:h-8 text-macro-water mb-1 sm:mb-2" />
-            <span className="text-xs sm:text-sm text-text-secondary">Água</span>
-            <span className="font-bold text-xl sm:text-2xl text-macro-water">{dietPlan.dailySummary.water}L</span>
+          {/* Card 5 - Água */}
+          <Card className="col-span-2 sm:col-span-1 flex flex-col items-center p-2.5 sm:p-4 bg-macro-water-light border border-macro-water text-center">
+            <Droplet className="w-5 sm:w-8 h-5 sm:h-8 text-macro-water mb-1 sm:mb-2" />
+            <span className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Água</span>
+            <span className="text-base sm:text-2xl font-bold text-macro-water">{dietPlan.dailySummary.water}L</span>
           </Card>
         </div>
       </div>
