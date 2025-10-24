@@ -89,46 +89,39 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
 
       {/* Seção Resumo Diário */}
       <div className="mb-6 sm:mb-8">
-        <h3 className="text-base sm:text-lg font-semibold text-text-primary mb-3 sm:mb-4">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
           Resumo Diário
         </h3>
 
-        {/* Este grid muda automaticamente: 2 cols no mobile, 5 cols no desktop */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4 mb-4 sm:mb-8">
-          
-          {/* Card Calorias - tamanhos mudam automaticamente */}
-          <div className="flex flex-col items-center text-center bg-white p-2.5 sm:p-4 rounded-lg border-2 border-orange-200">
+          <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-orange-200">
             <Flame className="w-5 sm:w-8 h-5 sm:h-8 text-orange-500 mb-1 sm:mb-2" />
-            <p className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Calorias</p>
-            <p className="text-base sm:text-2xl font-bold text-text-primary">{dietPlan.dailySummary.calories} kcal</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Calorias</p>
+            <p className="text-base sm:text-2xl font-bold text-gray-900">2300 kcal</p>
           </div>
 
-          {/* Card Proteína */}
-          <div className="flex flex-col items-center text-center bg-white p-2.5 sm:p-4 rounded-lg border-2 border-green-200">
+          <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-green-200">
             <Dumbbell className="w-5 sm:w-8 h-5 sm:h-8 text-primary mb-1 sm:mb-2" />
-            <p className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Proteína</p>
-            <p className="text-base sm:text-2xl font-bold text-primary">{dietPlan.dailySummary.protein}g</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Proteína</p>
+            <p className="text-base sm:text-2xl font-bold text-primary">300g</p>
           </div>
 
-          {/* Card Carboidratos */}
-          <div className="flex flex-col items-center text-center bg-white p-2.5 sm:p-4 rounded-lg border-2 border-red-200">
-            <Wheat className="w-5 sm:w-8 h-5 sm:h-8 text-macro-carbs mb-1 sm:mb-2" />
-            <p className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Carboidratos</p>
-            <p className="text-base sm:text-2xl font-bold text-macro-carbs">{dietPlan.dailySummary.carbs}g</p>
+          <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-red-200">
+            <Wheat className="w-5 sm:w-8 h-5 sm:h-8 text-red-500 mb-1 sm:mb-2" />
+            <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Carboidratos</p>
+            <p className="text-base sm:text-2xl font-bold text-red-500">150g</p>
           </div>
 
-          {/* Card Gordura */}
-          <div className="flex flex-col items-center text-center bg-white p-2.5 sm:p-4 rounded-lg border-2 border-yellow-200">
-            <Droplets className="w-5 sm:w-8 h-5 sm:h-8 text-macro-fats mb-1 sm:mb-2" />
-            <p className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Gordura</p>
-            <p className="text-base sm:text-2xl font-bold text-macro-fats">{dietPlan.dailySummary.fats}g</p>
+          <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-yellow-200">
+            <Droplets className="w-5 sm:w-8 h-5 sm:h-8 text-yellow-600 mb-1 sm:mb-2" />
+            <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Gordura</p>
+            <p className="text-base sm:text-2xl font-bold text-yellow-600">78g</p>
           </div>
 
-          {/* Card Água - SEM col-span */}
-          <div className="flex flex-col items-center text-center bg-white p-2.5 sm:p-4 rounded-lg border-2 border-blue-200">
-            <Droplet className="w-5 sm:w-8 h-5 sm:h-8 text-macro-water mb-1 sm:mb-2" />
-            <p className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Água</p>
-            <p className="text-base sm:text-2xl font-bold text-macro-water">{dietPlan.dailySummary.water}L</p>
+          <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-blue-200">
+            <Droplet className="w-5 sm:w-8 h-5 sm:h-8 text-blue-500 mb-1 sm:mb-2" />
+            <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Água</p>
+            <p className="text-base sm:text-2xl font-bold text-blue-500">3L</p>
           </div>
         </div>
       </div>
