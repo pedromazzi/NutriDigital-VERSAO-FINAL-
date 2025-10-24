@@ -3,7 +3,7 @@ import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import { UserData } from '@/App'; // Importar a interface UserData
 import { validateMealTimesOrder } from '@/utils/validation';
-import { Coffee, UtensilsCrossed, Cookie, Moon } from 'lucide-react'; // Importar ícones Lucide
+import { Coffee, UtensilsCrossed, Cookie, Moon, Lightbulb } from 'lucide-react'; // Importar ícones Lucide, adicionado Lightbulb
 
 interface DailyRoutineProps {
   userData: UserData;
@@ -141,7 +141,7 @@ const DailyRoutine: React.FC<DailyRoutineProps> = ({ userData, updateUserData, n
       {/* Dica sobre Rotina */}
       <div className="p-5 bg-tips-general-bg border border-tips-general-border rounded-lg mb-8 w-full">
         <div className="flex gap-3 items-start">
-          <span className="text-2xl">💡</span>
+          <Lightbulb className="w-6 h-6 text-secondary-orange flex-shrink-0 mt-0.5" /> {/* Ícone Lightbulb adicionado */}
           <div>
             <h4 className="font-semibold text-text-primary text-base mb-2">Dica: A importância da rotina alimentar</h4>
             <p className="text-sm leading-relaxed text-text-secondary">
