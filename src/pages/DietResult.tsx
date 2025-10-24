@@ -93,7 +93,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
           Resumo Diário
         </h3>
 
-        <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-4 sm:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4 mb-4 sm:mb-8">
           {/* Card 1 - Calorias */}
           <Card className="flex flex-col items-center p-2.5 sm:p-4 bg-white border border-gray-200 text-center">
             <Flame className="w-5 sm:w-8 h-5 sm:h-8 text-orange-500 mb-1 sm:mb-2" />
@@ -123,7 +123,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
           </Card>
 
           {/* Card 5 - Água */}
-          <Card className="col-span-2 sm:col-span-1 flex flex-col items-center p-2.5 sm:p-4 bg-macro-water-light border border-macro-water text-center">
+          <Card className="flex flex-col items-center p-2.5 sm:p-4 bg-macro-water-light border border-macro-water text-center">
             <Droplet className="w-5 sm:w-8 h-5 sm:h-8 text-macro-water mb-1 sm:mb-2" />
             <span className="text-[10px] sm:text-sm text-text-secondary mb-0.5 sm:mb-1">Água</span>
             <span className="text-base sm:text-2xl font-bold text-macro-water">{dietPlan.dailySummary.water}L</span>
