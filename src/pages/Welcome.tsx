@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserData } from '@/App'; // Importar a interface UserData
 import Button from '@/components/Button'; // Importar o componente Button
 import Input from '@/components/Input'; // Importar o componente Input
+import { ClipboardList, BarChart3, FileText } from 'lucide-react'; // Adicionado: Ícones Lucide
 
 interface WelcomeProps {
   userData: UserData;
@@ -51,21 +52,36 @@ const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo 
         {/* Cards informativos */}
         <div className="mb-5 space-y-3">
           <div className="bg-white p-4 rounded-lg shadow-card">
-            <p className="text-text-primary text-sm">
-              📝 Monte sua dieta personalizada em poucos passos.
-            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary-light rounded-lg flex items-center justify-center">
+                <ClipboardList className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-text-primary text-sm m-0">
+                Monte sua dieta personalizada em poucos passos.
+              </p>
+            </div>
           </div>
           
           <div className="bg-white p-4 rounded-lg shadow-card">
-            <p className="text-text-primary text-sm">
-              📊 Receba planos com calorias e macros calculados pra você.
-            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary-light rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-text-primary text-sm m-0">
+                Receba planos com calorias e macros calculados pra você.
+              </p>
+            </div>
           </div>
           
           <div className="bg-white p-4 rounded-lg shadow-card">
-            <p className="text-text-primary text-sm">
-              📄 Baixe sua dieta em PDF e siga seu progresso.
-            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary-light rounded-lg flex items-center justify-center">
+                <FileText className="w-5 h-5 text-primary" />
+              </div>
+              <p className="text-text-primary text-sm m-0">
+                Baixe sua dieta em PDF e siga seu progresso.
+              </p>
+            </div>
           </div>
         </div>
 
