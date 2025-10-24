@@ -311,21 +311,6 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
         </div>
       </div>
 
-      {/* Dica */}
-      <div className="bg-tips-general-bg border border-tips-general-border rounded-lg p-5 mb-8">
-        <div className="flex gap-3">
-          <div className="text-2xl">💡</div>
-          <div>
-            <h4 className="font-semibold text-text-primary mb-1">
-              Dica: Variedade é fundamental
-            </h4>
-            <p className="text-sm text-text-secondary leading-relaxed">
-              Quanto mais categorias você selecionar, mais variado e nutritivo será seu cardápio.
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Botões de navegação */}
       <div className="flex gap-3">
         <Button
