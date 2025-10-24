@@ -1,31 +1,123 @@
 import React, { useState } from 'react';
-import Button from '@/components/Button';
-import ProgressBar from '@/components/ProgressBar';
-import Card from '@/components/Card'; // Importar o componente Card
-import { UserData } from '@/App'; // Importar a interface UserData
-import { Check, Coffee, UtensilsCrossed, Cookie, Moon } from 'lucide-react'; // Importar ícones de check e refeições
+import { Coffee, UtensilsCrossed, Cookie, Moon, Check } from 'lucide-react';
+import Button from '@/components/Button'; // Importar o componente Button
+import ProgressBar from '@/components/ProgressBar'; // Importar o componente ProgressBar
+
+interface UserData {
+  userName?: string;
+  mealTimes?: {
+    breakfast?: string;
+    lunch?: string;
+    snack?: string;
+    dinner?: string;
+  };
+  // Adicionar selectedCategories ao UserData para persistência
+  selectedCategories?: SelectedCategories; 
+}
 
 interface FoodPreferencesProps {
   userData: UserData;
-  updateUserData: (field: keyof UserData, value: any) => void;
+  updateUserData: (field: keyof UserData, value: any) => void; // Ajustado para keyof UserData
   navigateTo: (screen: string) => void;
 }
 
+interface SelectedCategories {
+  breakfast: string[];
+  lunch: string[];
+  snack: string[];
+  dinner: string[];
+}
+
 const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserData, navigateTo }) => {
+  const [activeTab, setActiveTab] = useState('breakfast');
+  const [selectedCategories, setSelectedCategories] = useState<SelectedCategories>(
+    userData.selectedCategories || { // Inicializa com dados existentes ou vazio
+      breakfast: [],
+      lunch: [],
+      snack: [],
+      dinner: []
+    }
+  );
   const [isLoading, setIsLoading] = useState(false);
 
+  // Definição das refeições e categorias
+  const meals = [
+    {
+      id: 'breakfast',
+      name: 'Café da Manhã',
+      shortName: 'Café',
+      time: userData?.mealTimes?.breakfast || '09:00',
+      icon: Coffee,
+      categories: ['Proteínas', 'Carboidratos', 'Frutas', 'Bebidas']
+    },
+    {
+      id: 'lunch',
+      name: 'Almoço',
+      shortName: 'Almoço',
+      time: userData?.mealTimes?.lunch || '12:00',
+      icon: UtensilsCrossed,
+      categories: ['Proteínas', 'Carboidratos', 'Vegetais', 'Acompanhamentos']
+    },
+    {
+      id: 'snack',
+      name: 'Lanche da Tarde',
+      shortName: 'Lanche',
+      time: userData?.mealTimes?.snack || '16:00',
+      icon: Cookie,
+      categories: ['Proteínas', 'Carboidratos', 'Frutas']
+    },
+    {
+      id: 'dinner',
+      name: 'Jantar',
+      shortName: 'Jantar',
+      time: userData?.mealTimes?.dinner || '19:00',
+      icon: Moon,
+      categories: ['Proteínas', 'Carboidratos', 'Vegetais']
+    }
+  ];
+
+  const activeMeal = meals.find(m => m.id === activeTab)!;
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => {
+      const mealCategories = prev[activeTab as keyof SelectedCategories];
+      const isSelected = mealCategories.includes(category);
+      
+      return {
+        ...prev,
+        [activeTab]: isSelected
+          ? mealCategories.filter(c => c !== category)
+          : [...mealCategories, category]
+      };
+    });
+  };
+
+  const isCategorySelected = (category: string) => {
+    return selectedCategories[activeTab as keyof SelectedCategories].includes(category);
+  };
+
+  const getTotalSelectedCategories = () => {
+    return Object.values(selectedCategories).reduce((total, categories) => total + categories.length, 0);
+  };
+
+  const getMealSelectedCount = (mealId: string) => {
+    return selectedCategories[mealId as keyof SelectedCategories].length;
+  };
+
   const handleGenerateDiet = () => {
+    const allMealsHaveSelection = Object.entries(selectedCategories).every(
+      ([_, categories]) => categories.length > 0
+    );
+
+    if (!allMealsHaveSelection) {
+      alert('Selecione pelo menos uma categoria de alimento para cada refeição.');
+      return;
+    }
+
     setIsLoading(true);
+    updateUserData('foodPreferences', selectedCategories); // Atualiza foodPreferences com as categorias selecionadas
 
     setTimeout(() => {
-      // Salvar dados temporários para simular a geração da dieta
-      updateUserData('foodPreferences', {
-        breakfast: { proteins: ['Ovos'], carbs: ['Pão integral'], fruits: ['Banana'] },
-        lunch: { proteins: ['Peito de frango'], carbs: ['Arroz integral'] },
-        snack: { proteins: ['Whey Protein'], carbs: ['Aveia'], fruits: ['Morango'] },
-        dinner: { proteins: ['Salmão'], carbs: ['Batata doce'] }
-      });
-
       setIsLoading(false);
       navigateTo('dietResult');
     }, 1500);
@@ -35,77 +127,147 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
     navigateTo('goals');
   };
 
-  const mealIcons = {
-    'Café da Manhã': <Coffee className="w-5 h-5 text-gray-600" />,
-    'Almoço': <UtensilsCrossed className="w-5 h-5 text-gray-600" />,
-    'Lanche da Tarde': <Cookie className="w-5 h-5 text-gray-600" />,
-    'Jantar': <Moon className="w-5 h-5 text-gray-600" />,
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center px-5 py-10 max-w-3xl mx-auto">
-      <div className="flex justify-between items-center mb-8 w-full">
-        <div className="text-primary text-2xl font-bold">NutriDigital</div>
-        <ProgressBar currentStep={5} totalSteps={5} />
+    <div className="min-h-screen bg-gray-50 px-5 py-10 max-w-4xl mx-auto">
+      {/* Logo */}
+      <div className="mb-8">
+        <h1 className="text-primary text-2xl font-bold">
+          NutriDigital
+        </h1>
       </div>
 
-      <h1 className="text-3xl font-bold text-text-primary mb-2 text-center">Quais são seus alimentos preferidos?</h1>
-      <p className="text-base text-text-secondary mb-8 text-center">
-        Selecione os alimentos que você mais gosta para cada refeição. Isso nos ajudará a criar uma dieta deliciosa e personalizada para você.
+      {/* Progress Bar */}
+      <ProgressBar currentStep={5} totalSteps={5} className="mb-8" />
+
+      {/* Título */}
+      <h2 className="text-3xl font-bold text-text-primary mb-2">
+        Quais categorias de alimentos você prefere?
+      </h2>
+      <p className="text-base text-text-secondary mb-8">
+        Selecione as categorias de alimentos para cada refeição. Use as abas abaixo para navegar entre as refeições.
       </p>
 
-      {/* Card de Aviso - Placeholder */}
-      <Card className="bg-tips-general-bg border-2 border-dashed border-tips-general-border rounded-xl p-10 text-center mb-10 w-full">
-        <div className="text-6xl mb-5">🚧</div>
-        <h3 className="text-2xl font-semibold text-text-primary mb-3">
-          Sistema de Alimentos em Desenvolvimento
-        </h3>
-        <p className="text-base text-text-secondary leading-relaxed mb-5 max-w-2xl mx-auto">
-          A seleção de alimentos será implementada na próxima fase do desenvolvimento. 
-          Por enquanto, você pode avançar para visualizar a estrutura da dieta gerada.
-        </p>
-        <div className="inline-flex items-center gap-2 bg-primary-light px-5 py-3 rounded-lg text-sm text-primary font-semibold">
-          <Check size={16} />
-          <span>Estrutura e Design Completos</span>
+      {/* Card de Progresso */}
+      <div className="bg-primary-light border border-primary rounded-lg p-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+            {getTotalSelectedCategories()}
+          </div>
+          <div>
+            <p className="font-semibold text-text-primary">
+              {getTotalSelectedCategories()} categorias selecionadas no total
+            </p>
+            <p className="text-sm text-text-secondary">
+              Selecione pelo menos uma categoria por refeição
+            </p>
+          </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Preview das Seções (mockup) */}
-      <div className="mb-10 w-full">
-        <h3 className="text-lg font-semibold text-text-primary mb-5">
-          Próxima Implementação: Sistema de Seleção de Alimentos
-        </h3>
-        
-        <div className="flex flex-col space-y-3">
-          {['Café da Manhã', 'Almoço', 'Lanche da Tarde', 'Jantar'].map((meal, index) => (
-            <Card 
-              key={index}
-              className="bg-white border border-gray-200 rounded-lg p-5 flex justify-between items-center opacity-60"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-2xl">
-                  {mealIcons[meal as keyof typeof mealIcons]}
-                </div>
-                <span className="text-base font-medium text-text-primary">
-                  {meal}
+      {/* TABS - Abas das Refeições */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm mb-8">
+        {/* Tab Headers */}
+        <div className="flex border-b border-gray-200 overflow-x-auto">
+          {meals.map((meal) => {
+            const Icon = meal.icon;
+            const isActive = activeTab === meal.id;
+            const selectedCount = getMealSelectedCount(meal.id);
+
+            return (
+              <button
+                key={meal.id}
+                onClick={() => setActiveTab(meal.id)}
+                className={`flex-1 min-w-[120px] px-4 py-4 flex flex-col items-center gap-2 transition-colors ${
+                  isActive
+                    ? 'bg-primary/5 border-b-2 border-primary'
+                    : 'hover:bg-gray-50'
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-primary' : 'text-gray-600'}`} />
+                <span className={`text-sm font-medium ${isActive ? 'text-primary' : 'text-gray-700'}`}>
+                  {meal.shortName}
                 </span>
-              </div>
-              <span className="text-sm text-text-tertiary">
-                Em breve...
-              </span>
-            </Card>
-          ))}
+                {selectedCount > 0 && (
+                  <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">
+                    {selectedCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-6">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-text-primary mb-1">
+              {activeMeal.name}
+            </h3>
+            <p className="text-sm text-text-secondary">
+              Selecione as categorias de alimentos que você gostaria de incluir:
+            </p>
+          </div>
+
+          {/* Grid de Categorias */}
+          <div className="grid grid-cols-2 gap-3">
+            {activeMeal.categories.map((category) => {
+              const isSelected = isCategorySelected(category);
+              
+              return (
+                <button
+                  key={category}
+                  onClick={() => toggleCategory(category)}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    isSelected
+                      ? 'border-primary bg-primary/10'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={`font-medium ${
+                      isSelected ? 'text-primary' : 'text-text-primary'
+                    }`}>
+                      {category}
+                    </span>
+                    {isSelected && (
+                      <Check className="w-5 h-5 text-primary" />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Dica */}
+      <div className="bg-tips-general-bg border border-tips-general-border rounded-lg p-5 mb-8">
+        <div className="flex gap-3">
+          <div className="text-2xl">💡</div>
+          <div>
+            <h4 className="font-semibold text-text-primary mb-1">
+              Dica: Variedade é fundamental
+            </h4>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              Quanto mais categorias você selecionar, mais variado e nutritivo será seu cardápio.
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Botões de navegação */}
-      <div className="flex gap-3 mt-10 w-full">
-        <Button variant="secondary" onClick={handleBack} disabled={isLoading} className="flex-1 py-3.5">
+      <div className="flex gap-3">
+        <Button
+          variant="secondary"
+          onClick={handleBack}
+          disabled={isLoading}
+          className="flex-1 py-3.5"
+        >
           Voltar
         </Button>
-        <Button 
-          onClick={handleGenerateDiet} 
-          disabled={isLoading}
+        <Button
+          onClick={handleGenerateDiet}
+          disabled={isLoading || getTotalSelectedCategories() === 0}
           className="flex-[2] py-3.5 flex items-center justify-center gap-2"
         >
           {isLoading ? (
@@ -114,9 +276,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
               Gerando...
             </>
           ) : (
-            <>
-              Gerar minha dieta
-            </>
+            'Gerar minha dieta →'
           )}
         </Button>
       </div>
