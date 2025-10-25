@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
-import { UserData } from '@/App'; // Importar a interface UserData do App.tsx
-import { Flame, Dumbbell, Wheat, Droplets, Droplet, Download, RefreshCcw, Salad } from 'lucide-react'; // Adicionado Salad
-import { buildDiet, DietPlanResult } from '@/utils/dietBuilder'; // Importar buildDiet e DietPlanResult
+import { UserData } from '@/App';
+import { Flame, Dumbbell, Wheat, Droplets, Droplet, Download, RefreshCcw, Salad } from 'lucide-react';
+import { buildDiet } from '@/utils/dietBuilder';
 
 interface DietResultProps {
   userData: UserData;
-  resetUserData: () => void; // Adicionado para corresponder ao App.tsx
+  resetUserData: () => void;
   navigateTo: (screen: string) => void;
 }
 
 const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, navigateTo }) => {
-  const [diet, setDiet] = useState<DietPlanResult | null>(null);
+  const [diet, setDiet] = useState<any>(null);
 
   useEffect(() => {
     // Gerar a dieta automaticamente
@@ -26,12 +26,12 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
   }, [userData]);
 
   const handleDownloadPDF = () => {
-    alert('Funcionalidade de download de PDF será implementada no PROMPT 3 - Cérebro do App');
+    alert('Funcionalidade de download de PDF será implementada na Etapa 5');
   };
 
   const handleNewDiet = () => {
     if (window.confirm('Deseja criar uma nova dieta? Todos os dados serão perdidos.')) {
-      resetUserData(); // Usar a prop resetUserData
+      resetUserData();
       navigateTo('welcome');
     }
   };
@@ -98,7 +98,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
       {/* Refeições - Grid 2x2 */}
       <div className="mb-6 sm:mb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-          {diet.meals.map((meal, index) => (
+          {diet.meals.map((meal: any, index: number) => (
             <Card key={index} className="p-4 sm:p-5 bg-white border border-gray-200">
               {/* Header da refeição */}
               <div className="mb-3 pb-2 sm:pb-3 border-b border-gray-100">
@@ -112,7 +112,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
 
               {/* Lista de alimentos */}
               <div className="flex flex-col gap-0.5 sm:gap-1">
-                {meal.foods.map((food, foodIndex) => (
+                {meal.foods.map((food: any, foodIndex: number) => (
                   <div 
                     key={foodIndex}
                     className="text-xs sm:text-sm text-text-primary py-0.5 sm:py-1"
@@ -165,7 +165,6 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
             <p className="m-0 text-xs sm:text-sm leading-relaxed text-text-secondary">
               <strong>Quanto mais colorido, melhor!</strong> Um prato cheio de vegetais de cores variadas garante uma boa combinação de vitaminas, minerais e antioxidantes. Não se esqueça de incluí-los todos os dias!
             </p>
-          </p>
           </div>
         </div>
       </Card>
