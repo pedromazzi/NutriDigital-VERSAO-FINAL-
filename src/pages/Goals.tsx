@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
-import { UserData } from '@/types'; // Importar a interface UserData do types/index.ts
-import { Scale, Dumbbell, Heart, Check } from 'lucide-react';
+import { UserData } from '@/App'; // Importar a interface UserData
+import { Scale, Dumbbell, Heart, Check } from 'lucide-react'; // Importar Check para o card selecionado
 import { cn } from '@/lib/utils';
 
 interface GoalsProps {

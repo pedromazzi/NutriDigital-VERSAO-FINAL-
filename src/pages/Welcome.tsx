@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { UserData } from '@/types'; // Importar a interface UserData do types/index.ts
-import Button from '@/components/Button';
-import Input from '@/components/Input';
-import { ClipboardList, BarChart3, FileText } from 'lucide-react';
+import { UserData } from '@/App'; // Importar a interface UserData
+import Button from '@/components/Button'; // Importar o componente Button
+import Input from '@/components/Input'; // Importar o componente Input
+import { ClipboardList, BarChart3, FileText } from 'lucide-react'; // Adicionado: Ícones Lucide
 
 interface WelcomeProps {
   userData: UserData;
@@ -46,7 +46,7 @@ const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo 
           value={localName}
           onChange={(e) => setLocalName(e.target.value)}
           className="mb-5"
-          labelClassName="sr-only"
+          labelClassName="sr-only" // Esconder o label visualmente para este input
         />
 
         {/* Cards informativos */}

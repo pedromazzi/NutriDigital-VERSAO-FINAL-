@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
-import { UserData } from '@/types'; // Importar a interface UserData do types/index.ts
+import { UserData } from '@/App'; // Importar a interface UserData
 import { validateMealTimesOrder } from '@/utils/validation';
 import { Coffee, UtensilsCrossed, Cookie, Moon, Lightbulb } from 'lucide-react'; // Importar ícones Lucide, adicionado Lightbulb
 
