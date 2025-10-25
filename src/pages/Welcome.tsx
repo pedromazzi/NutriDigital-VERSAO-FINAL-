@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { UserData } from '@/App'; // Importar a interface UserData
-import Button from '@/components/Button'; // Importar o componente Button
-import Input from '@/components/Input'; // Importar o componente Input
+import { UserData } from '@/App';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
 import { ClipboardList, BarChart3, FileText } from 'lucide-react';
 
 interface WelcomeProps {
@@ -46,7 +46,7 @@ const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo 
           value={localName}
           onChange={(e) => setLocalName(e.target.value)}
           className="mb-5"
-          labelClassName="sr-only" // Esconder o label visualmente para este input
+          labelClassName="sr-only"
         />
 
         {/* Cards informativos */}
@@ -113,16 +113,14 @@ const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo 
           fullWidth
           onClick={handleNext}
           disabled={isButtonDisabled}
-          className="py-3.5 mb-3"
+          className="py-3.5"
         >
           Começar
         </Button>
+      </div>
 
-        {/* Botão para TestCalculator */}
-        <Button
-          variant="secondary"
-          fullWidth
-
+      {/* MODAL DE TERMOS DE USO */}
+      {showTerms && (
         <div 
           onClick={() => setShowTerms(false)}
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-5"
