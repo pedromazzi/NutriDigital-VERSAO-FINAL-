@@ -122,15 +122,7 @@ const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo 
         <Button
           variant="secondary"
           fullWidth
-          onClick={() => navigateTo('testCalculator')}
-          className="py-3.5"
-        >
-          <FlaskConical className="w-5 h-5 mr-2" /> Testar Calculadora
-        </Button>
-      </div>
 
-      {/* MODAL DE TERMOS DE USO */}
-      {showTerms && (
         <div 
           onClick={() => setShowTerms(false)}
           className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-5"
