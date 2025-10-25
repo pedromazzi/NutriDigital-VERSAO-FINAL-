@@ -3,7 +3,7 @@ import { Coffee, UtensilsCrossed, Cookie, Moon, Check, AlertCircle } from 'lucid
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
-import { FOOD_DATABASE, filterByIntolerances, getFoodsByMeal } from '@/data/foodDatabase';
+import { FOOD_DATABASE, filterByIntolerances, getFoodsByMeal } from '@/utils/fooddatabase';
 
 interface UserData {
   userName?: string;
