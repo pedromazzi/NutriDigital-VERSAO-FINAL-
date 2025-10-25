@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Coffee, UtensilsCrossed, Cookie, Moon, Check, AlertCircle } from 'lucide-react';
-import Button from '@/components/Button'; // Importar o componente Button
-import ProgressBar from '@/components/ProgressBar'; // Importar o componente ProgressBar
-import Card from '@/components/Card'; // Importar o componente Card
-import { UserData, SelectedCategories } from '@/types'; // Importar UserData e SelectedCategories do types/index.ts
+import Button from '@/components/Button';
+import ProgressBar from '@/components/ProgressBar';
+import Card from '@/components/Card';
+import { UserData, SelectedCategories } from '@/types';
+import { MEAL_CATEGORIES } from '@/data/foodData'; // Importar MEAL_CATEGORIES
 
 interface FoodPreferencesProps {
   userData: UserData;
@@ -14,49 +15,49 @@ interface FoodPreferencesProps {
 const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserData, navigateTo }) => {
   const [activeTab, setActiveTab] = useState('breakfast');
   const [selectedCategories, setSelectedCategories] = useState<SelectedCategories>(
-    userData.selectedCategories || { // Inicializa com dados existentes ou vazio
+    userData.selectedCategories || {
       breakfast: [],
       lunch: [],
       snack: [],
       dinner: []
     }
   );
-  const [intolerances, setIntolerances] = useState<string[]>(userData.intolerances || []); // Inicializa com dados existentes ou vazio
+  const [intolerances, setIntolerances] = useState<string[]>(userData.intolerances || []);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Definição das refeições e categorias (CORRIGIDO)
+  // Mapear MEAL_CATEGORIES para o formato esperado pelo componente
   const meals = [
     {
       id: 'breakfast',
-      name: 'Café da Manhã',
+      name: MEAL_CATEGORIES.breakfast.name,
       shortName: 'Café',
       time: userData?.mealTimes?.breakfast || '09:00',
       icon: Coffee,
-      categories: ['Proteínas', 'Carboidratos', 'Frutas', 'Laticínios', 'Gorduras Boas']
+      categories: MEAL_CATEGORIES.breakfast.categories.map(cat => cat.name)
     },
     {
       id: 'lunch',
-      name: 'Almoço',
+      name: MEAL_CATEGORIES.lunch.name,
       shortName: 'Almoço',
       time: userData?.mealTimes?.lunch || '12:00',
       icon: UtensilsCrossed,
-      categories: ['Proteínas', 'Carboidratos', 'Vegetais', 'Leguminosas', 'Gorduras Boas']
+      categories: MEAL_CATEGORIES.lunch.categories.map(cat => cat.name)
     },
     {
-    id: 'snack',
-      name: 'Lanche da Tarde',
+      id: 'snack',
+      name: MEAL_CATEGORIES.snack.name,
       shortName: 'Lanche',
       time: userData?.mealTimes?.snack || '16:00',
       icon: Cookie,
-      categories: ['Proteínas', 'Carboidratos', 'Frutas', 'Laticínios', 'Gorduras Boas']
+      categories: MEAL_CATEGORIES.snack.categories.map(cat => cat.name)
     },
     {
       id: 'dinner',
-      name: 'Jantar',
+      name: MEAL_CATEGORIES.dinner.name,
       shortName: 'Jantar',
       time: userData?.mealTimes?.dinner || '19:00',
       icon: Moon,
-      categories: ['Proteínas', 'Carboidratos', 'Vegetais', 'Leguminosas', 'Gorduras Boas']
+      categories: MEAL_CATEGORIES.dinner.categories.map(cat => cat.name)
     }
   ];
 
