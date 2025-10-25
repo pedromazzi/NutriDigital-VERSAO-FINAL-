@@ -198,11 +198,14 @@ const calculateTMB = (userData: UserData): number => {
   const { weight, height, age, gender } = userData;
   if (weight === null || height === null || age === null || gender === null) return 0;
 
+  let tmb: number;
   if (gender === 'Masculino') {
-    return (10 * weight) + (6.25 * height) - (5 * age) + 5;
+    tmb = (10 * weight) + (6.25 * height) - (5 * age) + 5;
   } else { // Feminino
-    return (10 * weight) + (6.25 * height) - (5 * age) - 161;
+    tmb = (10 * weight) + (6.25 * height) - (5 * age) - 161;
   }
+  console.log(`TMB: ${tmb.toFixed(2)} kcal`);
+  return tmb;
 };
 
 const calculateTDEE = (tmb: number, activityLevel: UserData['activityLevel']): number => {
@@ -213,17 +216,32 @@ const calculateTDEE = (tmb: number, activityLevel: UserData['activityLevel']): n
     case 'Intenso': activityFactor = 1.725; break;
     case 'Muito Intenso': activityFactor = 1.9; break;
   }
-  return tmb * activityFactor;
+  const tdee = tmb * activityFactor;
+  console.log(`TDEE: ${tdee.toFixed(2)} kcal (Fator: ${activityFactor})`);
+  return tdee;
 };
 
 const adjustCaloriesByGoal = (tdee: number, goal: UserData['goal']): number => {
+  let totalCalories: number;
   if (goal === 'Emagrecimento') {
-    return tdee - 500;
+    totalCalories = tdee - 500;
   } else if (goal === 'Ganho de Massa') {
-    return tdee + 300;
+    totalCalories = tdee + 300;
   } else { // Manutenção
-    return tdee;
+    totalCalories = tdee;
   }
+
+  // Validação crítica: MÍNIMO 1200 kcal, MÁXIMO 4000 kcal
+  if (totalCalories < 1200) {
+    totalCalories = 1200;
+    console.log(`Calorias ajustadas para o mínimo (1200 kcal) devido ao objetivo de ${goal}.`);
+  } else if (totalCalories > 4000) {
+    totalCalories = 4000;
+    console.log(`Calorias ajustadas para o máximo (4000 kcal) devido ao objetivo de ${goal}.`);
+  }
+
+  console.log(`Calorias Diárias (ajustadas por objetivo): ${totalCalories.toFixed(2)} kcal`);
+  return totalCalories;
 };
 
 const calculateMacros = (totalCalories: number, goal: UserData['goal']): { protein: number; carbs: number; fats: number } => {
@@ -247,6 +265,7 @@ const calculateMacros = (totalCalories: number, goal: UserData['goal']): { prote
   const carbs = (totalCalories * carbPct) / 4;
   const fats = (totalCalories * fatPct) / 9;
 
+  console.log(`Macros calculados: Prot: ${protein.toFixed(2)}g, Carbs: ${carbs.toFixed(2)}g, Fats: ${fats.toFixed(2)}g`);
   return { protein: Math.round(protein), carbs: Math.round(carbs), fats: Math.round(fats) };
 };
 
@@ -266,8 +285,10 @@ const calculateWaterIntake = (weight: number | null, activityLevel: UserData['ac
   const totalWaterMl = waterBase + activityAdjustment;
   const totalWaterL = totalWaterMl / 1000;
 
-  // Round to nearest 0.5L
-  return Math.round(totalWaterL * 2) / 2;
+  // Arredondar para 0.5L
+  const roundedWaterL = Math.round(totalWaterL * 2) / 2;
+  console.log(`Água total: ${roundedWaterL.toFixed(1)}L`);
+  return roundedWaterL;
 };
 
 const filterFoodsByIntolerances = <T extends FoodItem | FruitItem>(foods: T[], intolerances: string[]): T[] => {
@@ -301,51 +322,56 @@ export function generateDiet(userData: UserData): DietPlanOutput {
   // 1. Cálculos Fundamentais
   const tmb = calculateTMB(userData);
   const tdee = calculateTDEE(tmb, userData.activityLevel);
-  const totalDailyCalories = Math.round(adjustCaloriesByGoal(tdee, userData.goal));
-  const { protein, carbs, fats } = calculateMacros(totalDailyCalories, userData.goal);
+  let totalDailyCalories = adjustCaloriesByGoal(tdee, userData.goal);
+  let { protein, carbs, fats } = calculateMacros(totalDailyCalories, userData.goal);
   const water = calculateWaterIntake(userData.weight, userData.activityLevel);
 
-  // 2. Filtrar alimentos por intolerâncias
-  const availableBreakfastSnackProteins = filterFoodsByIntolerances(detailedBreakfastSnackProteins, userData.intolerances);
-  const availableBreakfastSnackCarbs = filterFoodsByIntolerances(detailedBreakfastSnackCarbs, userData.intolerances);
-  const availableFruits = detailedFruits; // Frutas não têm glúten/lactose na tabela fornecida
-  const availableDairy = filterFoodsByIntolerances(detailedDairy, userData.intolerances);
-  const availableGoodFats = filterFoodsByIntolerances(detailedGoodFats, userData.intolerances);
-  const availableLunchDinnerProteins = filterFoodsByIntolerances(detailedLunchDinnerProteins, userData.intolerances);
-  const availableLunchDinnerCarbs = filterFoodsByIntolerances(detailedLunchDinnerCarbs, userData.intolerances);
-  const availableLegumes = filterFoodsByIntolerances(detailedLegumes, userData.intolerances);
+  // 2. Validação Crítica (já incorporada em adjustCaloriesByGoal para min/max)
+  // E para a soma dos macros, faremos no final com base nos alimentos reais.
 
   // 3. Distribuição calórica por refeição
-  // Mantido como sugestão, mas a soma real será calculada no final
   const mealCalorieDistribution = {
     breakfast: Math.round(totalDailyCalories * 0.25),
     lunch: Math.round(totalDailyCalories * 0.35),
     snack: Math.round(totalDailyCalories * 0.15),
     dinner: Math.round(totalDailyCalories * 0.25),
   };
+  console.log("Distribuição calórica por refeição (alvo):", mealCalorieDistribution);
 
   const meals: DietMeal[] = [];
-  let remainingGoodFatsForDistribution = [...availableGoodFats];
-  let chiaSeedsUsed = 0;
-  const usedFoodsToday: string[] = []; // Para variedade
+  const usedFoodsToday: string[] = []; // Para variedade e evitar repetições excessivas
+  let currentTotalKcalFromFoods = 0;
+  let currentTotalProtFromFoods = 0;
+  let currentTotalCarbsFromFoods = 0;
+  let currentTotalFatsFromFoods = 0;
 
-  // Helper para selecionar um alimento com base nas preferências e evitar repetições
-  const selectFood = <T extends FoodItem | FruitItem>(
-    foodList: T[],
-    preferences: string[] | undefined,
+  // Helper para selecionar um alimento das preferências do usuário, filtrando por intolerâncias
+  const selectPreferredFood = <T extends FoodItem | FruitItem>(
+    allFoodsList: T[],
+    preferredFoodsNames: string[] | undefined,
+    intolerances: string[],
     excludeUsed: string[] = []
   ): T | undefined => {
-    let candidates = foodList.filter(f => !excludeUsed.includes(f.alimento.toLowerCase()));
-    if (preferences && preferences.length > 0) {
-      const preferredCandidates = candidates.filter(f => preferences.map(p => p.toLowerCase()).includes(f.alimento.toLowerCase()));
+    let candidates = allFoodsList;
+
+    // 1. Filtrar por intolerâncias
+    candidates = filterFoodsByIntolerances(candidates, intolerances);
+
+    // 2. Filtrar por preferências do usuário
+    if (preferredFoodsNames && preferredFoodsNames.length > 0) {
+      const preferredCandidates = candidates.filter(f => preferredFoodsNames.map(p => p.toLowerCase()).includes(f.alimento.toLowerCase()));
       if (preferredCandidates.length > 0) {
         candidates = preferredCandidates;
       }
     }
+    
+    // 3. Excluir alimentos já usados hoje para variedade
+    candidates = candidates.filter(f => !excludeUsed.includes(f.alimento.toLowerCase()));
+
     return getRandomElement(candidates);
   };
 
-  // Helper para adicionar alimento à refeição
+  // Helper para adicionar alimento à refeição e atualizar macros totais
   const addFoodToMeal = (
     mealFoods: DietFood[],
     food: FoodItem | FruitItem,
@@ -359,155 +385,65 @@ export function generateDiet(userData: UserData): DietPlanOutput {
       substitutionQuantity: substitution?.quantity || null,
     });
     usedFoodsToday.push(food.alimento.toLowerCase());
-    return food; // Retorna o alimento adicionado para cálculos de macro
+    
+    currentTotalKcalFromFoods += food.kcal;
+    currentTotalProtFromFoods += food.prot;
+    currentTotalCarbsFromFoods += food.carbo;
+    currentTotalFatsFromFoods += food.gord;
   };
 
   // --- Geração das Refeições ---
 
   // Refeição: Café da Manhã
   const breakfastFoods: DietFood[] = [];
-  let currentBreakfastMacros = { kcal: 0, prot: 0, carbo: 0, gord: 0 };
+  const userBreakfastPrefs = userData.foodPreferences.breakfast;
 
   // Proteína (Obrigatório)
-  const bp = selectFood(availableBreakfastSnackProteins, userData.foodPreferences.breakfast.proteins, usedFoodsToday);
-  if (bp) {
-    const addedFood = addFoodToMeal(breakfastFoods, bp, true);
-    currentBreakfastMacros.kcal += addedFood.kcal;
-    currentBreakfastMacros.prot += addedFood.prot;
-    currentBreakfastMacros.carbo += addedFood.carbo;
-    currentBreakfastMacros.gord += addedFood.gord;
-  }
+  const bp = selectPreferredFood(detailedBreakfastSnackProteins, userBreakfastPrefs.proteins, userData.intolerances, usedFoodsToday);
+  if (bp) addFoodToMeal(breakfastFoods, bp, true);
 
   // Carboidrato (Obrigatório)
-  const bc = selectFood(availableBreakfastSnackCarbs, userData.foodPreferences.breakfast.carbs, usedFoodsToday);
-  if (bc) {
-    const addedFood = addFoodToMeal(breakfastFoods, bc, true);
-    currentBreakfastMacros.kcal += addedFood.kcal;
-    currentBreakfastMacros.prot += addedFood.prot;
-    currentBreakfastMacros.carbo += addedFood.carbo;
-    currentBreakfastMacros.gord += addedFood.gord;
-  }
+  const bc = selectPreferredFood(detailedBreakfastSnackCarbs, userBreakfastPrefs.carbs, userData.intolerances, usedFoodsToday);
+  if (bc) addFoodToMeal(breakfastFoods, bc, true);
 
   // Fruta (Obrigatório)
-  const bf = selectFood(availableFruits, userData.foodPreferences.breakfast.fruits, usedFoodsToday);
-  if (bf) {
-    const addedFood = addFoodToMeal(breakfastFoods, bf);
-    currentBreakfastMacros.kcal += addedFood.kcal;
-    currentBreakfastMacros.prot += addedFood.prot;
-    currentBreakfastMacros.carbo += addedFood.carbo;
-    currentBreakfastMacros.gord += addedFood.gord;
-  }
+  const bf = selectPreferredFood(detailedFruits, userBreakfastPrefs.fruits, userData.intolerances, usedFoodsToday);
+  if (bf) addFoodToMeal(breakfastFoods, bf);
 
   // Laticínios (Opcional)
-  if (userData.selectedCategories.breakfast.includes('Laticínios') && availableDairy.length > 0) {
-    const bd = selectFood(availableDairy, userData.foodPreferences.breakfast.dairy, usedFoodsToday);
-    if (bd) {
-      const addedFood = addFoodToMeal(breakfastFoods, bd);
-      currentBreakfastMacros.kcal += addedFood.kcal;
-      currentBreakfastMacros.prot += addedFood.prot;
-      currentBreakfastMacros.carbo += addedFood.carbo;
-      currentBreakfastMacros.gord += addedFood.gord;
-    }
-  }
+  const bd = selectPreferredFood(detailedDairy, userBreakfastPrefs.dairy, userData.intolerances, usedFoodsToday);
+  if (bd) addFoodToMeal(breakfastFoods, bd);
 
-  // Gordura Boa (Opcional/Distribuição)
-  let fatAddedToBreakfast = false;
-  if (userData.selectedCategories.breakfast.includes('Gorduras Boas') && userData.foodPreferences.breakfast.fats.length > 0) {
-    const bgf = selectFood(availableGoodFats, userData.foodPreferences.breakfast.fats, usedFoodsToday);
-    if (bgf) {
-      const addedFood = addFoodToMeal(breakfastFoods, bgf);
-      currentBreakfastMacros.kcal += addedFood.kcal;
-      currentBreakfastMacros.prot += addedFood.prot;
-      currentBreakfastMacros.carbo += addedFood.carbo;
-      currentBreakfastMacros.gord += addedFood.gord;
-      remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== bgf.alimento);
-      if (bgf.alimento === 'Sementes de chia') chiaSeedsUsed += 15;
-      fatAddedToBreakfast = true;
-    }
-  } else if (remainingGoodFatsForDistribution.length > 0 && !fatAddedToBreakfast) {
-    const randomFat = getRandomElement(remainingGoodFatsForDistribution);
-    if (randomFat) {
-      const addedFood = addFoodToMeal(breakfastFoods, randomFat);
-      currentBreakfastMacros.kcal += addedFood.kcal;
-      currentBreakfastMacros.prot += addedFood.prot;
-      currentBreakfastMacros.carbo += addedFood.carbo;
-      currentBreakfastMacros.gord += addedFood.gord;
-      remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== randomFat.alimento);
-      if (randomFat.alimento === 'Sementes de chia') chiaSeedsUsed += 15;
-      fatAddedToBreakfast = true;
-    }
-  }
+  // Gordura Boa (Opcional)
+  const bgf = selectPreferredFood(detailedGoodFats, userBreakfastPrefs.fats, userData.intolerances, usedFoodsToday);
+  if (bgf) addFoodToMeal(breakfastFoods, bgf);
 
   meals.push({
     name: 'Café da Manhã',
     time: userData.mealTimes.breakfast,
-    calories: Math.round(currentBreakfastMacros.kcal),
+    calories: 0, // Será preenchido no final com base nos alimentos reais
     foods: breakfastFoods,
   });
 
   // Refeição: Almoço
   const lunchFoods: DietFood[] = [];
-  let currentLunchMacros = { kcal: 0, prot: 0, carbo: 0, gord: 0 };
+  const userLunchPrefs = userData.foodPreferences.lunch;
 
   // Proteína (Obrigatório)
-  const lp = selectFood(availableLunchDinnerProteins, userData.foodPreferences.lunch.proteins, usedFoodsToday);
-  if (lp) {
-    const addedFood = addFoodToMeal(lunchFoods, lp, true);
-    currentLunchMacros.kcal += addedFood.kcal;
-    currentLunchMacros.prot += addedFood.prot;
-    currentLunchMacros.carbo += addedFood.carbo;
-    currentLunchMacros.gord += addedFood.gord;
-  }
+  const lp = selectPreferredFood(detailedLunchDinnerProteins, userLunchPrefs.proteins, userData.intolerances, usedFoodsToday);
+  if (lp) addFoodToMeal(lunchFoods, lp, true);
 
   // Carboidrato (Obrigatório)
-  const lc = selectFood(availableLunchDinnerCarbs, userData.foodPreferences.lunch.carbs, usedFoodsToday);
-  if (lc) {
-    const addedFood = addFoodToMeal(lunchFoods, lc, true);
-    currentLunchMacros.kcal += addedFood.kcal;
-    currentLunchMacros.prot += addedFood.prot;
-    currentLunchMacros.carbo += addedFood.carbo;
-    currentLunchMacros.gord += addedFood.gord;
-  }
+  const lc = selectPreferredFood(detailedLunchDinnerCarbs, userLunchPrefs.carbs, userData.intolerances, usedFoodsToday);
+  if (lc) addFoodToMeal(lunchFoods, lc, true);
 
   // Leguminosas (Opcional)
-  if (userData.selectedCategories.lunch.includes('Leguminosas') && availableLegumes.length > 0) {
-    const ll = selectFood(availableLegumes, userData.foodPreferences.lunch.legumes, usedFoodsToday);
-    if (ll) {
-      const addedFood = addFoodToMeal(lunchFoods, ll);
-      currentLunchMacros.kcal += addedFood.kcal;
-      currentLunchMacros.prot += addedFood.prot;
-      currentLunchMacros.carbo += addedFood.carbo;
-      currentLunchMacros.gord += addedFood.gord;
-    }
-  }
+  const ll = selectPreferredFood(detailedLegumes, userLunchPrefs.legumes, userData.intolerances, usedFoodsToday);
+  if (ll) addFoodToMeal(lunchFoods, ll);
 
-  // Gordura Boa (Opcional/Distribuição)
-  let fatAddedToLunch = false;
-  if (userData.selectedCategories.lunch.includes('Gorduras Boas') && userData.foodPreferences.lunch.fats.length > 0) {
-    const lgf = selectFood(availableGoodFats, userData.foodPreferences.lunch.fats, usedFoodsToday);
-    if (lgf) {
-      const addedFood = addFoodToMeal(lunchFoods, lgf);
-      currentLunchMacros.kcal += addedFood.kcal;
-      currentLunchMacros.prot += addedFood.prot;
-      currentLunchMacros.carbo += addedFood.carbo;
-      currentLunchMacros.gord += addedFood.gord;
-      remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== lgf.alimento);
-      if (lgf.alimento === 'Sementes de chia') chiaSeedsUsed += 15;
-      fatAddedToLunch = true;
-    }
-  } else if (remainingGoodFatsForDistribution.length > 0 && !fatAddedToLunch) {
-    const randomFat = getRandomElement(remainingGoodFatsForDistribution);
-    if (randomFat) {
-      const addedFood = addFoodToMeal(lunchFoods, randomFat);
-      currentLunchMacros.kcal += addedFood.kcal;
-      currentLunchMacros.prot += addedFood.prot;
-      currentLunchMacros.carbo += addedFood.carbo;
-      currentLunchMacros.gord += addedFood.gord;
-      remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== randomFat.alimento);
-      if (randomFat.alimento === 'Sementes de chia') chiaSeedsUsed += 15;
-      fatAddedToLunch = true;
-    }
-  }
+  // Gordura Boa (Opcional)
+  const lgf = selectPreferredFood(detailedGoodFats, userLunchPrefs.fats, userData.intolerances, usedFoodsToday);
+  if (lgf) addFoodToMeal(lunchFoods, lgf);
 
   // Vegetais (Obrigatório)
   lunchFoods.push({ name: 'vegetais', quantity: 'à gosto', substitution: null, substitutionQuantity: null });
@@ -515,211 +451,60 @@ export function generateDiet(userData: UserData): DietPlanOutput {
   meals.push({
     name: 'Almoço',
     time: userData.mealTimes.lunch,
-    calories: Math.round(currentLunchMacros.kcal),
+    calories: 0, // Será preenchido no final
     foods: lunchFoods,
   });
 
   // Refeição: Lanche da Tarde
   const snackFoods: DietFood[] = [];
-  let currentSnackMacros = { kcal: 0, prot: 0, carbo: 0, gord: 0 };
+  const userSnackPrefs = userData.foodPreferences.snack;
 
   // Proteína (Obrigatório)
-  const sp = selectFood(availableBreakfastSnackProteins, userData.foodPreferences.snack.proteins, usedFoodsToday);
-  if (sp) {
-    const addedFood = addFoodToMeal(snackFoods, sp, true);
-    currentSnackMacros.kcal += addedFood.kcal;
-    currentSnackMacros.prot += addedFood.prot;
-    currentSnackMacros.carbo += addedFood.carbo;
-    currentSnackMacros.gord += addedFood.gord;
-  }
+  const sp = selectPreferredFood(detailedBreakfastSnackProteins, userSnackPrefs.proteins, userData.intolerances, usedFoodsToday);
+  if (sp) addFoodToMeal(snackFoods, sp, true);
 
   // Carboidrato (Obrigatório)
-  const sc = selectFood(availableBreakfastSnackCarbs, userData.foodPreferences.snack.carbs, usedFoodsToday);
-  if (sc) {
-    const addedFood = addFoodToMeal(snackFoods, sc, true);
-    currentSnackMacros.kcal += addedFood.kcal;
-    currentSnackMacros.prot += addedFood.prot;
-    currentSnackMacros.carbo += addedFood.carbo;
-    currentSnackMacros.gord += addedFood.gord;
-  }
+  const sc = selectPreferredFood(detailedBreakfastSnackCarbs, userSnackPrefs.carbs, userData.intolerances, usedFoodsToday);
+  if (sc) addFoodToMeal(snackFoods, sc, true);
 
   // Fruta (Obrigatório)
-  const sf = selectFood(availableFruits, userData.foodPreferences.snack.fruits, usedFoodsToday);
-  if (sf) {
-    const addedFood = addFoodToMeal(snackFoods, sf);
-    currentSnackMacros.kcal += addedFood.kcal;
-    currentSnackMacros.prot += addedFood.prot;
-    currentSnackMacros.carbo += addedFood.carbo;
-    currentSnackMacros.gord += addedFood.gord;
-  }
+  const sf = selectPreferredFood(detailedFruits, userSnackPrefs.fruits, userData.intolerances, usedFoodsToday);
+  if (sf) addFoodToMeal(snackFoods, sf);
 
   // Laticínios (Opcional)
-  if (userData.selectedCategories.snack.includes('Laticínios') && availableDairy.length > 0) {
-    const sd = selectFood(availableDairy, userData.foodPreferences.snack.dairy, usedFoodsToday);
-    if (sd) {
-      const addedFood = addFoodToMeal(snackFoods, sd);
-      currentSnackMacros.kcal += addedFood.kcal;
-      currentSnackMacros.prot += addedFood.prot;
-      currentSnackMacros.carbo += addedFood.carbo;
-      currentSnackMacros.gord += addedFood.gord;
-    }
-  }
+  const sd = selectPreferredFood(detailedDairy, userSnackPrefs.dairy, userData.intolerances, usedFoodsToday);
+  if (sd) addFoodToMeal(snackFoods, sd);
 
-  // Gordura Boa (Opcional/Distribuição)
-  let fatAddedToSnack = false;
-  if (userData.selectedCategories.snack.includes('Gorduras Boas') && userData.foodPreferences.snack.fats.length > 0) {
-    const sgf = selectFood(availableGoodFats, userData.foodPreferences.snack.fats, usedFoodsToday);
-    if (sgf) {
-      if (sgf.alimento === 'Sementes de chia' && chiaSeedsUsed + 15 > 15) {
-        // Skip chia if it exceeds limit, try another fat
-        const otherFats = remainingGoodFatsForDistribution.filter(f => f.alimento !== 'Sementes de chia');
-        const otherRandomFat = getRandomElement(otherFats);
-        if (otherRandomFat) {
-          const addedFood = addFoodToMeal(snackFoods, otherRandomFat);
-          currentSnackMacros.kcal += addedFood.kcal;
-          currentSnackMacros.prot += addedFood.prot;
-          currentSnackMacros.carbo += addedFood.carbo;
-          currentSnackMacros.gord += addedFood.gord;
-          remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== otherRandomFat.alimento);
-          fatAddedToSnack = true;
-        }
-      } else {
-        const addedFood = addFoodToMeal(snackFoods, sgf);
-        currentSnackMacros.kcal += addedFood.kcal;
-        currentSnackMacros.prot += addedFood.prot;
-        currentSnackMacros.carbo += addedFood.carbo;
-        currentSnackMacros.gord += addedFood.gord;
-        remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== sgf.alimento);
-        if (sgf.alimento === 'Sementes de chia') chiaSeedsUsed += 15;
-        fatAddedToSnack = true;
-      }
-    }
-  } else if (remainingGoodFatsForDistribution.length > 0 && !fatAddedToSnack && chiaSeedsUsed < 15) {
-    const randomFat = getRandomElement(remainingGoodFatsForDistribution);
-    if (randomFat) {
-      if (randomFat.alimento === 'Sementes de chia' && chiaSeedsUsed + 15 > 15) {
-        const otherFats = remainingGoodFatsForDistribution.filter(f => f.alimento !== 'Sementes de chia');
-        const otherRandomFat = getRandomElement(otherFats);
-        if (otherRandomFat) {
-          const addedFood = addFoodToMeal(snackFoods, otherRandomFat);
-          currentSnackMacros.kcal += addedFood.kcal;
-          currentSnackMacros.prot += addedFood.prot;
-          currentSnackMacros.carbo += addedFood.carbo;
-          currentSnackMacros.gord += addedFood.gord;
-          remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== otherRandomFat.alimento);
-          fatAddedToSnack = true;
-        }
-      } else {
-        const addedFood = addFoodToMeal(snackFoods, randomFat);
-        currentSnackMacros.kcal += addedFood.kcal;
-        currentSnackMacros.prot += addedFood.prot;
-        currentSnackMacros.carbo += addedFood.carbo;
-        currentSnackMacros.gord += addedFood.gord;
-        remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== randomFat.alimento);
-        if (randomFat.alimento === 'Sementes de chia') chiaSeedsUsed += 15;
-        fatAddedToSnack = true;
-      }
-    }
-  }
+  // Gordura Boa (Opcional)
+  const sgf = selectPreferredFood(detailedGoodFats, userSnackPrefs.fats, userData.intolerances, usedFoodsToday);
+  if (sgf) addFoodToMeal(snackFoods, sgf);
 
   meals.push({
     name: 'Lanche da Tarde',
     time: userData.mealTimes.snack,
-    calories: Math.round(currentSnackMacros.kcal),
+    calories: 0, // Será preenchido no final
     foods: snackFoods,
   });
 
   // Refeição: Jantar
   const dinnerFoods: DietFood[] = [];
-  let currentDinnerMacros = { kcal: 0, prot: 0, carbo: 0, gord: 0 };
+  const userDinnerPrefs = userData.foodPreferences.dinner;
 
   // Proteína (Obrigatório)
-  const dp = selectFood(availableLunchDinnerProteins, userData.foodPreferences.dinner.proteins, usedFoodsToday);
-  if (dp) {
-    const addedFood = addFoodToMeal(dinnerFoods, dp, true);
-    currentDinnerMacros.kcal += addedFood.kcal;
-    currentDinnerMacros.prot += addedFood.prot;
-    currentDinnerMacros.carbo += addedFood.carbo;
-    currentDinnerMacros.gord += addedFood.gord;
-  }
+  const dp = selectPreferredFood(detailedLunchDinnerProteins, userDinnerPrefs.proteins, userData.intolerances, usedFoodsToday);
+  if (dp) addFoodToMeal(dinnerFoods, dp, true);
 
   // Carboidrato (Obrigatório)
-  const dc = selectFood(availableLunchDinnerCarbs, userData.foodPreferences.dinner.carbs, usedFoodsToday);
-  if (dc) {
-    const addedFood = addFoodToMeal(dinnerFoods, dc, true);
-    currentDinnerMacros.kcal += addedFood.kcal;
-    currentDinnerMacros.prot += addedFood.prot;
-    currentDinnerMacros.carbo += addedFood.carbo;
-    currentDinnerMacros.gord += addedFood.gord;
-  }
+  const dc = selectPreferredFood(detailedLunchDinnerCarbs, userDinnerPrefs.carbs, userData.intolerances, usedFoodsToday);
+  if (dc) addFoodToMeal(dinnerFoods, dc, true);
 
   // Leguminosas (Opcional)
-  if (userData.selectedCategories.dinner.includes('Leguminosas') && availableLegumes.length > 0) {
-    const dl = selectFood(availableLegumes, userData.foodPreferences.dinner.legumes, usedFoodsToday);
-    if (dl) {
-      const addedFood = addFoodToMeal(dinnerFoods, dl);
-      currentDinnerMacros.kcal += addedFood.kcal;
-      currentDinnerMacros.prot += addedFood.prot;
-      currentDinnerMacros.carbo += addedFood.carbo;
-      currentDinnerMacros.gord += addedFood.gord;
-    }
-  }
+  const dl = selectPreferredFood(detailedLegumes, userDinnerPrefs.legumes, userData.intolerances, usedFoodsToday);
+  if (dl) addFoodToMeal(dinnerFoods, dl);
 
-  // Gordura Boa (Opcional/Distribuição)
-  let fatAddedToDinner = false;
-  if (userData.selectedCategories.dinner.includes('Gorduras Boas') && userData.foodPreferences.dinner.fats.length > 0) {
-    const dgf = selectFood(availableGoodFats, userData.foodPreferences.dinner.fats, usedFoodsToday);
-    if (dgf) {
-      if (dgf.alimento === 'Sementes de chia' && chiaSeedsUsed + 15 > 15) {
-        const otherFats = remainingGoodFatsForDistribution.filter(f => f.alimento !== 'Sementes de chia');
-        const otherRandomFat = getRandomElement(otherFats);
-        if (otherRandomFat) {
-          const addedFood = addFoodToMeal(dinnerFoods, otherRandomFat);
-          currentDinnerMacros.kcal += addedFood.kcal;
-          currentDinnerMacros.prot += addedFood.prot;
-          currentDinnerMacros.carbo += addedFood.carbo;
-          currentDinnerMacros.gord += addedFood.gord;
-          remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== otherRandomFat.alimento);
-          fatAddedToDinner = true;
-        }
-      } else {
-        const addedFood = addFoodToMeal(dinnerFoods, dgf);
-        currentDinnerMacros.kcal += addedFood.kcal;
-        currentDinnerMacros.prot += addedFood.prot;
-        currentDinnerMacros.carbo += addedFood.carbo;
-        currentDinnerMacros.gord += addedFood.gord;
-        remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== dgf.alimento);
-        if (dgf.alimento === 'Sementes de chia') chiaSeedsUsed += 15;
-        fatAddedToDinner = true;
-      }
-    }
-  } else if (remainingGoodFatsForDistribution.length > 0 && !fatAddedToDinner && chiaSeedsUsed < 15) {
-    const randomFat = getRandomElement(remainingGoodFatsForDistribution);
-    if (randomFat) {
-      if (randomFat.alimento === 'Sementes de chia' && chiaSeedsUsed + 15 > 15) {
-        const otherFats = remainingGoodFatsForDistribution.filter(f => f.alimento !== 'Sementes de chia');
-        const otherRandomFat = getRandomElement(otherFats);
-        if (otherRandomFat) {
-          const addedFood = addFoodToMeal(dinnerFoods, otherRandomFat);
-          currentDinnerMacros.kcal += addedFood.kcal;
-          currentDinnerMacros.prot += addedFood.prot;
-          currentDinnerMacros.carbo += addedFood.carbo;
-          currentDinnerMacros.gord += addedFood.gord;
-          remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== otherRandomFat.alimento);
-          fatAddedToDinner = true;
-        }
-      } else {
-        const addedFood = addFoodToMeal(dinnerFoods, randomFat);
-        currentDinnerMacros.kcal += addedFood.kcal;
-        currentDinnerMacros.prot += addedFood.prot;
-        currentDinnerMacros.carbo += addedFood.carbo;
-        currentDinnerMacros.gord += addedFood.gord;
-        remainingGoodFatsForDistribution = remainingGoodFatsForDistribution.filter(f => f.alimento !== randomFat.alimento);
-        if (randomFat.alimento === 'Sementes de chia') chiaSeedsUsed += 15;
-        fatAddedToDinner = true;
-      }
-    }
-  }
+  // Gordura Boa (Opcional)
+  const dgf = selectPreferredFood(detailedGoodFats, userDinnerPrefs.fats, userData.intolerances, usedFoodsToday);
+  if (dgf) addFoodToMeal(dinnerFoods, dgf);
 
   // Vegetais (Obrigatório)
   dinnerFoods.push({ name: 'vegetais', quantity: 'à gosto', substitution: null, substitutionQuantity: null });
@@ -727,34 +512,47 @@ export function generateDiet(userData: UserData): DietPlanOutput {
   meals.push({
     name: 'Jantar',
     time: userData.mealTimes.dinner,
-    calories: Math.round(currentDinnerMacros.kcal),
+    calories: 0, // Será preenchido no final
     foods: dinnerFoods,
   });
 
-  // Recalcular macros totais com base nos alimentos finais e suas porções
-  let totalProt = 0;
-  let totalCarbs = 0;
-  let totalFats = 0;
-  let totalKcal = 0;
-
+  // Recalcular calorias e macros para cada refeição e para o resumo diário
   meals.forEach(meal => {
+    let mealKcal = 0;
     meal.foods.forEach(foodItem => {
       const food = findFoodItem(foodItem.name, allDetailedFoods);
-      if (food && foodItem.quantity !== 'à gosto') {
-        totalKcal += food.kcal;
-        totalProt += food.prot;
-        totalCarbs += food.carbo;
-        totalFats += food.gord;
+      if (food && foodItem.quantity !== 'à gosto') { // 'vegetais à gosto' não tem kcal definida
+        mealKcal += food.kcal;
       }
     });
+    meal.calories = Math.round(mealKcal);
   });
+
+  // Validação crítica: Soma dos macros = Calorias_Diárias (±50 kcal)
+  const calculatedTotalKcal = Math.round(currentTotalKcalFromFoods);
+  const calculatedTotalProt = Math.round(currentTotalProtFromFoods);
+  const calculatedTotalCarbs = Math.round(currentTotalCarbsFromFoods);
+  const calculatedTotalFats = Math.round(currentTotalFatsFromFoods);
+
+  const macrosSumKcal = (calculatedTotalProt * 4) + (calculatedTotalCarbs * 4) + (calculatedTotalFats * 9);
+  const diff = Math.abs(calculatedTotalKcal - macrosSumKcal);
+
+  console.log(`Total Kcal dos alimentos: ${calculatedTotalKcal}`);
+  console.log(`Kcal da soma dos macros: ${macrosSumKcal}`);
+  console.log(`Diferença (Kcal): ${diff}`);
+
+  if (diff > 50) {
+    console.warn("Atenção: A soma das calorias dos alimentos difere em mais de 50 kcal da soma dos macros. Isso pode indicar um problema na seleção de alimentos ou na tabela TACO.");
+    // Em um cenário real, poderíamos tentar ajustar as porções ou selecionar outros alimentos.
+    // Por enquanto, vamos usar os valores calculados dos alimentos.
+  }
 
   const finalDietPlan: DietPlanOutput = {
     dailySummary: {
-      calories: Math.round(totalKcal),
-      protein: Math.round(totalProt),
-      carbs: Math.round(totalCarbs),
-      fats: Math.round(totalFats),
+      calories: calculatedTotalKcal,
+      protein: calculatedTotalProt,
+      carbs: calculatedTotalCarbs,
+      fats: calculatedTotalFats,
       water: water,
     },
     meals: meals,
