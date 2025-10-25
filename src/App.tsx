@@ -12,6 +12,7 @@ import DailyRoutine from "./pages/DailyRoutine";
 import Goals from "./pages/Goals";
 import FoodPreferences from "./pages/FoodPreferences";
 import DietResult from "./pages/DietResult";
+import TestCalculator from "./pages/TestCalculator"; // Importar o novo componente
 
 // Definir as interfaces para os dados do usuário
 interface MealPreferences {
@@ -151,6 +152,8 @@ const App = () => {
         return <FoodPreferences userData={userData} updateUserData={updateUserData} navigateTo={navigateTo} />;
       case 'dietResult':
         return <DietResult userData={userData} resetUserData={resetUserData} navigateTo={navigateTo} />;
+      case 'testCalculator': // Nova rota
+        return <TestCalculator />;
       default:
         return <Welcome userData={userData} updateUserData={updateUserData} navigateTo={navigateTo} />;
     }

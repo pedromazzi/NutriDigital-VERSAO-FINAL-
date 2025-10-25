@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { UserData } from '@/App'; // Importar a interface UserData
 import Button from '@/components/Button'; // Importar o componente Button
 import Input from '@/components/Input'; // Importar o componente Input
-import { ClipboardList, BarChart3, FileText } from 'lucide-react'; // Adicionado: Ícones Lucide
+import { ClipboardList, BarChart3, FileText, FlaskConical } from 'lucide-react'; // Adicionado: Ícones Lucide, incluindo FlaskConical
 
 interface WelcomeProps {
   userData: UserData;
@@ -113,9 +113,19 @@ const Welcome: React.FC<WelcomeProps> = ({ userData, updateUserData, navigateTo 
           fullWidth
           onClick={handleNext}
           disabled={isButtonDisabled}
-          className="py-3.5"
+          className="py-3.5 mb-3"
         >
           Começar
+        </Button>
+
+        {/* Botão para TestCalculator */}
+        <Button
+          variant="secondary"
+          fullWidth
+          onClick={() => navigateTo('testCalculator')}
+          className="py-3.5"
+        >
+          <FlaskConical className="w-5 h-5 mr-2" /> Testar Calculadora
         </Button>
       </div>
 
