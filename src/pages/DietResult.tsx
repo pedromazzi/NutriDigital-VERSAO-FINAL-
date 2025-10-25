@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
 import { UserData } from '@/App'; // Importar a interface UserData do App.tsx
 import { Flame, Dumbbell, Wheat, Droplets, Droplet, Download, RefreshCcw, Salad } from 'lucide-react'; // Adicionado Salad
+import { buildDiet, DietPlanResult } from '@/utils/dietBuilder'; // Importar buildDiet e DietPlanResult
 
 interface DietResultProps {
   userData: UserData;
@@ -11,58 +12,18 @@ interface DietResultProps {
 }
 
 const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, navigateTo }) => {
-  // Dados mockados para visualização da estrutura, usando a nova estrutura fornecida
-  const dietPlan = userData.dietPlan || {
-    dailySummary: {
-      calories: 2300,
-      protein: 300,
-      carbs: 150,
-      fats: 78,
-      water: 3
-    },
-    meals: [
-      {
-        name: 'Café da Manhã',
-        time: userData?.mealTimes?.breakfast || '09:00',
-        calories: 400,
-        foods: [
-          { emoji: '🥚', quantity: '2 unidades', name: 'ovos' },
-          { emoji: '🍞', quantity: '2 fatias', name: 'pão integral' },
-          { emoji: '🍌', quantity: '1 unidade', name: 'banana' }
-        ]
-      },
-      {
-        name: 'Almoço',
-        time: userData?.mealTimes?.lunch || '12:00',
-        calories: 650,
-        foods: [
-          { emoji: '🍚', quantity: '250g', name: 'arroz branco cozido' },
-          { emoji: '🍗', quantity: '150g', name: 'peito de frango' },
-          { emoji: '🫒', quantity: '10ml', name: 'azeite de oliva' }
-        ]
-      },
-      {
-        name: 'Lanche da Tarde',
-        time: userData?.mealTimes?.snack || '16:00',
-        calories: 300,
-        foods: [
-          { emoji: '💪', quantity: '30g', name: 'whey protein' },
-          { emoji: '🥛', quantity: '200ml', name: 'leite integral' },
-          { emoji: '🍓', quantity: '100g', name: 'morango' }
-        ]
-      },
-      {
-        name: 'Jantar',
-        time: userData?.mealTimes?.dinner || '19:00',
-        calories: 650,
-        foods: [
-          { emoji: '🐟', quantity: '150g', name: 'salmão' },
-          { emoji: '🥔', quantity: '200g', name: 'batata doce' },
-          { emoji: '🥬', quantity: 'à gosto', name: 'vegetais' }
-        ]
-      }
-    ]
-  };
+  const [diet, setDiet] = useState<DietPlanResult | null>(null);
+
+  useEffect(() => {
+    // Gerar a dieta automaticamente
+    if (userData) {
+      const generatedDiet = buildDiet(userData);
+      console.log('Dieta gerada:', generatedDiet);
+      
+      // Salvar no estado
+      setDiet(generatedDiet);
+    }
+  }, [userData]);
 
   const handleDownloadPDF = () => {
     alert('Funcionalidade de download de PDF será implementada no PROMPT 3 - Cérebro do App');
@@ -74,6 +35,14 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
       navigateTo('welcome');
     }
   };
+
+  if (!diet) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-4 sm:px-5 py-6 sm:py-10 max-w-5xl mx-auto flex items-center justify-center">
+        <p className="text-lg text-text-secondary">Gerando sua dieta...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-5 py-6 sm:py-10 max-w-5xl mx-auto">
@@ -97,31 +66,31 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
           <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-orange-200">
             <Flame className="w-5 sm:w-8 h-5 sm:h-8 text-orange-500 mb-1 sm:mb-2" />
             <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Calorias</p>
-            <p className="text-base sm:text-2xl font-bold text-gray-900">2300 kcal</p>
+            <p className="text-base sm:text-2xl font-bold text-gray-900">{diet.dailySummary.calories} kcal</p>
           </div>
 
           <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-green-200">
             <Dumbbell className="w-5 sm:w-8 h-5 sm:h-8 text-primary mb-1 sm:mb-2" />
             <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Proteína</p>
-            <p className="text-base sm:text-2xl font-bold text-primary">300g</p>
+            <p className="text-base sm:text-2xl font-bold text-primary">{diet.dailySummary.protein}g</p>
           </div>
 
           <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-red-200">
             <Wheat className="w-5 sm:w-8 h-5 sm:h-8 text-red-500 mb-1 sm:mb-2" />
             <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Carboidratos</p>
-            <p className="text-base sm:text-2xl font-bold text-red-500">150g</p>
+            <p className="text-base sm:text-2xl font-bold text-red-500">{diet.dailySummary.carbs}g</p>
           </div>
 
           <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-yellow-200">
             <Droplets className="w-5 sm:w-8 h-5 sm:h-8 text-yellow-600 mb-1 sm:mb-2" />
             <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Gordura</p>
-            <p className="text-base sm:text-2xl font-bold text-yellow-600">78g</p>
+            <p className="text-base sm:text-2xl font-bold text-yellow-600">{diet.dailySummary.fats}g</p>
           </div>
 
           <div className="bg-white p-2.5 sm:p-4 rounded-lg border-2 border-blue-200">
             <Droplet className="w-5 sm:w-8 h-5 sm:h-8 text-blue-500 mb-1 sm:mb-2" />
             <p className="text-[10px] sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Água</p>
-            <p className="text-base sm:text-2xl font-bold text-blue-500">3L</p>
+            <p className="text-base sm:text-2xl font-bold text-blue-500">{diet.dailySummary.water}L</p>
           </div>
         </div>
       </div>
@@ -129,7 +98,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
       {/* Refeições - Grid 2x2 */}
       <div className="mb-6 sm:mb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-          {dietPlan.meals.map((meal, index) => (
+          {diet.meals.map((meal, index) => (
             <Card key={index} className="p-4 sm:p-5 bg-white border border-gray-200">
               {/* Header da refeição */}
               <div className="mb-3 pb-2 sm:pb-3 border-b border-gray-100">
@@ -149,6 +118,11 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
                     className="text-xs sm:text-sm text-text-primary py-0.5 sm:py-1"
                   >
                     <span className="font-medium">{food.quantity}</span> {food.name}
+                    {food.substitution && (
+                      <span className="text-text-tertiary italic ml-2">
+                        (Sugestão: {food.substitution.quantity} {food.substitution.name})
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -191,6 +165,7 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
             <p className="m-0 text-xs sm:text-sm leading-relaxed text-text-secondary">
               <strong>Quanto mais colorido, melhor!</strong> Um prato cheio de vegetais de cores variadas garante uma boa combinação de vitaminas, minerais e antioxidantes. Não se esqueça de incluí-los todos os dias!
             </p>
+          </p>
           </div>
         </div>
       </Card>
