@@ -12,7 +12,7 @@ import DailyRoutine from "./pages/DailyRoutine";
 import Goals from "./pages/Goals";
 import FoodPreferences from "./pages/FoodPreferences";
 import DietResult from "./pages/DietResult";
-import TestCalculator from "./pages/TestCalculator"; // Importar o novo componente
+
 
 // Definir as interfaces para os dados do usuário
 interface MealPreferences {
