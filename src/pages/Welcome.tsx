@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { UserData } from '@/App'; // Importar a interface UserData
 import Button from '@/components/Button'; // Importar o componente Button
 import Input from '@/components/Input'; // Importar o componente Input
-import { ClipboardList, BarChart3, FileText, FlaskConical } from 'lucide-react'; // Adicionado: Ícones Lucide, incluindo FlaskConical
+import { ClipboardList, BarChart3, FileText } from 'lucide-react';
 
 interface WelcomeProps {
   userData: UserData;
