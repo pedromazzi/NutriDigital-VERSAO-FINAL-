@@ -4,6 +4,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// Importar as interfaces de tipos
+import { UserData, DietPlanOutput, FoodPreferencesData, SelectedCategories, MealPreferences } from "./types";
+
 // Importar as páginas
 import Welcome from "./pages/Welcome";
 import UserInfo from "./pages/UserInfo";
@@ -13,51 +16,8 @@ import Goals from "./pages/Goals";
 import FoodPreferences from "./pages/FoodPreferences";
 import DietResult from "./pages/DietResult";
 
-// Definir as interfaces para os dados do usuário
-interface MealPreferences {
-  proteins: string[];
-  carbs: string[];
-  fruits?: string[];
-  fats: string[];
-  dairy?: string[];
-  legumes?: string[];
-}
-
-interface FoodPreferencesData { // Renomeado para evitar conflito com o componente
-  breakfast: MealPreferences;
-  lunch: MealPreferences;
-  snack: MealPreferences;
-  dinner: MealPreferences;
-}
-
-interface SelectedCategories {
-  breakfast: string[];
-  lunch: string[];
-  snack: string[];
-  dinner: string[];
-}
-
-export interface UserData {
-  userName: string;
-  termsAccepted: boolean;
-  weight: number | null;
-  age: number | null;
-  height: number | null;
-  gender: 'Masculino' | 'Feminino' | null;
-  practicesActivity: boolean | null;
-  activityLevel: 'Sedentario' | 'Leve' | 'Moderado' | 'Intenso' | 'Muito Intenso' | null;
-  mealTimes: {
-    breakfast: string;
-    lunch: string;
-    snack: string;
-    dinner: string;
-  };
-  goal: 'Emagrecimento' | 'Ganho de Massa' | 'Manutenção' | null;
-  foodPreferences: FoodPreferencesData; // Usando o tipo renomeado
-  selectedCategories: SelectedCategories; // Adicionado para persistência das categorias selecionadas
-  intolerances: string[]; // Adicionado para persistência das intolerâncias
-  dietPlan: any | null;
-}
+// Importar a função de geração de dieta
+import { generateDiet } from "./utils/dietGenerator";
 
 const initialState: UserData = {
   userName: '',
@@ -103,13 +63,13 @@ const initialState: UserData = {
       fats: []
     }
   },
-  selectedCategories: { // Inicializando com arrays vazios
+  selectedCategories: {
     breakfast: [],
     lunch: [],
     snack: [],
     dinner: []
   },
-  intolerances: [], // Inicializando com array vazio
+  intolerances: [],
   dietPlan: null
 };
 
@@ -131,6 +91,11 @@ const App = () => {
   };
 
   const navigateTo = (screen: string) => {
+    if (screen === 'dietResult') {
+      // Gerar a dieta antes de navegar para a tela de resultados
+      const generatedDiet = generateDiet(userData);
+      updateUserData('dietPlan', generatedDiet);
+    }
     setCurrentScreen(screen);
     window.scrollTo(0, 0); // Scroll para o topo ao navegar
   };

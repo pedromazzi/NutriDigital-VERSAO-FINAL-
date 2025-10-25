@@ -3,30 +3,12 @@ import { Coffee, UtensilsCrossed, Cookie, Moon, Check, AlertCircle } from 'lucid
 import Button from '@/components/Button'; // Importar o componente Button
 import ProgressBar from '@/components/ProgressBar'; // Importar o componente ProgressBar
 import Card from '@/components/Card'; // Importar o componente Card
-
-interface UserData {
-  userName?: string;
-  mealTimes?: {
-    breakfast?: string;
-    lunch?: string;
-    snack?: string;
-    dinner?: string;
-  };
-  selectedCategories?: SelectedCategories; // Adicionado para persistência
-  intolerances?: string[]; // Adicionado para persistência
-}
+import { UserData, SelectedCategories } from '@/types'; // Importar UserData e SelectedCategories do types/index.ts
 
 interface FoodPreferencesProps {
   userData: UserData;
-  updateUserData: (field: keyof UserData, value: any) => void; // Ajustado para keyof UserData
+  updateUserData: (field: keyof UserData, value: any) => void;
   navigateTo: (screen: string) => void;
-}
-
-interface SelectedCategories {
-  breakfast: string[];
-  lunch: string[];
-  snack: string[];
-  dinner: string[];
 }
 
 const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserData, navigateTo }) => {
@@ -61,7 +43,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
       categories: ['Proteínas', 'Carboidratos', 'Vegetais', 'Leguminosas', 'Gorduras Boas']
     },
     {
-      id: 'snack',
+    id: 'snack',
       name: 'Lanche da Tarde',
       shortName: 'Lanche',
       time: userData?.mealTimes?.snack || '16:00',
@@ -131,6 +113,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
     updateUserData('selectedCategories', selectedCategories);
     updateUserData('intolerances', intolerances);
 
+    // A navegação para 'dietResult' agora acionará a geração da dieta em App.tsx
     setTimeout(() => {
       setIsLoading(false);
       navigateTo('dietResult');

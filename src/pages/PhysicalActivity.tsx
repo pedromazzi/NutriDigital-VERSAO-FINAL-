@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
-import { UserData } from '@/App'; // Importar a interface UserData
-import { Check, Activity, Ban } from 'lucide-react'; // Importar ícones de check, Activity e Ban
+import { UserData } from '@/types'; // Importar a interface UserData do types/index.ts
+import { Check, Activity, Ban } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PhysicalActivityProps {

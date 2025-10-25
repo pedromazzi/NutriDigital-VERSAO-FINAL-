@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
 import ProgressBar from '@/components/ProgressBar';
-import { UserData } from '@/App'; // Importar a interface UserData
+import { UserData } from '@/types'; // Importar a interface UserData do types/index.ts
 import { validateWeight, validateAge, validateHeight } from '@/utils/validation';
-import { cn } from '@/lib/utils'; // Importar cn para classes condicionais
-import { User } from 'lucide-react'; // Importar ícone User
+import { cn } from '@/lib/utils';
+import { User } from 'lucide-react';
 
 interface UserInfoProps {
   userData: UserData;
