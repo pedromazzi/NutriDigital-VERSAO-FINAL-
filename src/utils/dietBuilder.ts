@@ -281,42 +281,80 @@ function selectFood(selectedIds: string[] | undefined, availableFoods: FoodItem[
   return validFoods[Math.floor(Math.random() * validFoods.length)];
 }
 
-// ⚖️ CALCULAR PORÇÃO
+// ⚖️ CALCULAR PORÇÃO COM UNIDADES CORRETAS
 function calculatePortion(food: FoodItem, targetCalories: number, dailyCalories: number): FoodInMeal {
   const baseCalories = food.nutrition.calories;
   const basePortion = food.portion.amount;
+  const portionDesc = food.portion.description;
   
   // Calcular multiplicador baseado no objetivo calórico
   let multiplier = targetCalories / baseCalories;
   
   // Limitar multiplicador para porções realistas
   if (food.category === 'protein') {
-    multiplier = Math.max(1, Math.min(3, multiplier)); // 1x a 3x
+    multiplier = Math.max(1, Math.min(3, multiplier));
   } else if (food.category === 'carb') {
-    multiplier = Math.max(0.5, Math.min(2.5, multiplier)); // 0.5x a 2.5x
+    multiplier = Math.max(0.5, Math.min(2.5, multiplier));
   }
   
-  // Arredondar para valores práticos
-  const portionAmount = Math.round(basePortion * multiplier / 10) * 10;
+  // Calcular calorias reais da porção
+  const actualCalories = Math.round(baseCalories * multiplier);
   
-  // Calcular calorias da porção ajustada
-  const actualCalories = Math.round((portionAmount / basePortion) * baseCalories);
-  
-  // Formatar quantidade
+  // FORMATAR QUANTIDADE BASEADO NO TIPO DE PORÇÃO
   let quantityText = '';
-  if (food.portion.unit === 'g') {
-    quantityText = `${portionAmount}g`;
-  } else if (food.portion.description.includes('unidade')) {
+  
+  // CASO 1: UNIDADES (ovos, frutas)
+  if (portionDesc.includes('unidade')) {
     const units = Math.max(1, Math.round(multiplier));
     quantityText = `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
-  } else if (food.portion.description.includes('fatia')) {
+  }
+  
+  // CASO 2: FATIAS (pães, queijos)
+  else if (portionDesc.includes('fatia')) {
     const slices = Math.max(1, Math.round(multiplier * 2));
     quantityText = `${slices} ${slices === 1 ? 'fatia' : 'fatias'}`;
-  } else if (food.portion.description.includes('colher')) {
+  }
+  
+  // CASO 3: COLHERES DE SOPA (pasta amendoim, aveia, azeite)
+  else if (portionDesc.includes('colher de sopa')) {
     const spoons = Math.max(1, Math.round(multiplier));
     quantityText = `${spoons} ${spoons === 1 ? 'colher de sopa' : 'colheres de sopa'}`;
-  } else {
-    quantityText = food.portion.description;
+  }
+  
+  // CASO 4: COLHERES (genérico)
+  else if (portionDesc.includes('colher')) {
+    const spoons = Math.max(1, Math.round(multiplier));
+    quantityText = `${spoons} colher${spoons > 1 ? 'es' : ''} de sopa`;
+  }
+  
+  // CASO 5: ML (leites, iogurtes líquidos)
+  else if (food.portion.unit === 'ml') {
+    const ml = Math.round(basePortion * multiplier / 50) * 50; // Arredondar para 50ml
+    quantityText = `${ml}ml`;
+  }
+  
+  // CASO 6: GRAMAS (proteínas almoço/jantar, carboidratos almoço/jantar)
+  else if (food.portion.unit === 'g') {
+    // Para proteínas e carbs de almoço/jantar, usar gramas
+    if (food.mealGroup.includes('lunch') || food.mealGroup.includes('dinner')) {
+      const grams = Math.round(basePortion * multiplier / 10) * 10; // Arredondar para 10g
+      quantityText = `${grams}g`;
+    } 
+    // Para café/lanche, tentar usar descrição original se não caiu em nenhum caso acima
+    else {
+      quantityText = portionDesc;
+    }
+  }
+  
+  // CASO 7: SCOOP (whey protein)
+  else if (portionDesc.includes('scoop')) {
+    const scoops = Math.max(1, Math.round(multiplier));
+    quantityText = `${scoops} ${scoops === 1 ? 'scoop' : 'scoops'}`;
+  }
+  
+  // CASO PADRÃO: usar descrição original
+  else {
+    quantityText = portionDesc;
   }
   
   return {
