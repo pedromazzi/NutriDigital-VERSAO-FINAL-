@@ -139,13 +139,13 @@ function filterFoodsByIntolerance(intolerances: string[]): FoodDatabaseType {
 function buildMeal(
   name: string,
   time: string,
-  targetCalories: number,
+  mealTargetCalories: number, // Renomeado para clareza
   preferences: MealPreferences,
   availableFoods: FoodDatabaseType,
   mealType: MealGroup,
   dailyCalories: number
 ): MealPlan {
-  console.log(`🍽️ Montando ${name} (${targetCalories} kcal)...`);
+  console.log(`🍽️ Montando ${name} (${mealTargetCalories} kcal)...`);
   
   const foods: FoodInMeal[] = [];
   let currentCalories = 0;
@@ -159,7 +159,7 @@ function buildMeal(
   );
   
   if (proteinFood) {
-    const proteinPortion = calculatePortion(proteinFood, targetCalories * 0.35, dailyCalories);
+    const proteinPortion = calculatePortion(proteinFood, mealTargetCalories, dailyCalories, proteinFood.category);
     foods.push({
       ...proteinPortion,
       substitution: findSubstitution(proteinFood, mealType, availableFoods)
@@ -176,7 +176,7 @@ function buildMeal(
   );
   
   if (carbFood) {
-    const carbPortion = calculatePortion(carbFood, targetCalories * 0.35, dailyCalories);
+    const carbPortion = calculatePortion(carbFood, mealTargetCalories, dailyCalories, carbFood.category);
     foods.push({
       ...carbPortion,
       substitution: findSubstitution(carbFood, mealType, availableFoods)
@@ -189,13 +189,11 @@ function buildMeal(
     const fruitFood = selectFood(preferences.fruits, availableFoods.fruits);
     
     if (fruitFood) {
-      const fruitPortion: FoodInMeal = {
-        name: fruitFood.name.toLowerCase(),
-        quantity: fruitFood.portion.description,
-        calories: fruitFood.nutrition.calories,
+      const fruitPortion = calculatePortion(fruitFood, mealTargetCalories, dailyCalories, fruitFood.category);
+      foods.push({
+        ...fruitPortion,
         substitution: findFruitSubstitution(fruitFood, availableFoods.fruits)
-      };
-      foods.push(fruitPortion);
+      });
       currentCalories += fruitPortion.calories;
     }
   }
@@ -204,13 +202,8 @@ function buildMeal(
   if ((mealType === 'breakfast' || mealType === 'snack') && preferences.dairy && preferences.dairy.length > 0) {
     const dairyFood = selectFood(preferences.dairy, availableFoods.dairy);
     
-    if (dairyFood && (currentCalories + dairyFood.nutrition.calories) <= targetCalories + 50) {
-      const dairyPortion: FoodInMeal = {
-        name: dairyFood.name.toLowerCase(),
-        quantity: dairyFood.portion.description,
-        calories: dairyFood.nutrition.calories,
-        substitution: null
-      };
+    if (dairyFood && (currentCalories + dairyFood.nutrition.calories) <= mealTargetCalories + 50) {
+      const dairyPortion = calculatePortion(dairyFood, mealTargetCalories, dailyCalories, dairyFood.category);
       foods.push(dairyPortion);
       currentCalories += dairyPortion.calories;
     }
@@ -220,13 +213,8 @@ function buildMeal(
   if ((mealType === 'lunch' || mealType === 'dinner') && preferences.legumes && preferences.legumes.length > 0) {
     const legumeFood = selectFood(preferences.legumes, availableFoods.legumes);
     
-    if (legumeFood && (currentCalories + legumeFood.nutrition.calories) <= targetCalories + 50) {
-      const legumePortion: FoodInMeal = {
-        name: legumeFood.name.toLowerCase(),
-        quantity: legumeFood.portion.description,
-        calories: legumeFood.nutrition.calories,
-        substitution: null
-      };
+    if (legumeFood && (currentCalories + legumeFood.nutrition.calories) <= mealTargetCalories + 50) {
+      const legumePortion = calculatePortion(legumeFood, mealTargetCalories, dailyCalories, legumeFood.category);
       foods.push(legumePortion);
       currentCalories += legumePortion.calories;
     }
@@ -236,13 +224,8 @@ function buildMeal(
   if (preferences.fats && preferences.fats.length > 0) {
     const fatFood = selectFood(preferences.fats, availableFoods.fats);
     
-    if (fatFood && (currentCalories + fatFood.nutrition.calories) <= targetCalories + 50) {
-      const fatPortion: FoodInMeal = {
-        name: fatFood.name.toLowerCase(),
-        quantity: fatFood.portion.description,
-        calories: fatFood.nutrition.calories,
-        substitution: null
-      };
+    if (fatFood && (currentCalories + fatFood.nutrition.calories) <= mealTargetCalories + 50) {
+      const fatPortion = calculatePortion(fatFood, mealTargetCalories, dailyCalories, fatFood.category);
       foods.push(fatPortion);
       currentCalories += fatPortion.calories;
     }
@@ -281,78 +264,108 @@ function selectFood(selectedIds: string[] | undefined, availableFoods: FoodItem[
   return validFoods[Math.floor(Math.random() * validFoods.length)];
 }
 
-// ⚖️ CALCULAR PORÇÃO COM UNIDADES CORRETAS
-function calculatePortion(food: FoodItem, targetCalories: number, dailyCalories: number): FoodInMeal {
+// ⚖️ CALCULAR PORÇÃO COM LIMITES DINÂMICOS BASEADOS NO OBJETIVO CALÓRICO
+function calculatePortion(food: FoodItem, mealTargetCalories: number, dailyCalories: number, foodCategory: FoodCategory): FoodInMeal {
   const baseCalories = food.nutrition.calories;
   const basePortion = food.portion.amount;
   const portionDesc = food.portion.description;
   
-  // Calcular multiplicador baseado no objetivo calórico
-  let multiplier = targetCalories / baseCalories;
+  // CALCULAR CALORIAS ALVO PARA ESTE ALIMENTO ESPECÍFICO
+  let targetFoodCalories: number;
   
-  // Limitar multiplicador para porções realistas
-  if (food.category === 'protein') {
-    multiplier = Math.max(1, Math.min(3, multiplier));
-  } else if (food.category === 'carb') {
-    multiplier = Math.max(0.5, Math.min(2.5, multiplier));
+  if (foodCategory === 'protein') {
+    targetFoodCalories = mealTargetCalories * 0.30; // 30% das calorias da refeição para proteína
+  } else if (foodCategory === 'carb') {
+    targetFoodCalories = mealTargetCalories * 0.30; // 30% das calorias da refeição para carboidrato
+  } else if (foodCategory === 'fat') {
+    targetFoodCalories = mealTargetCalories * 0.10; // 10% das calorias da refeição para gordura
+  } else if (foodCategory === 'fruit' || foodCategory === 'dairy' || foodCategory === 'legume') {
+    targetFoodCalories = baseCalories; // Para esses, a porção base é geralmente fixa
+  } else {
+    targetFoodCalories = baseCalories;
   }
   
-  // Calcular calorias reais da porção
+  // Calcular multiplicador inicial
+  let multiplier = targetFoodCalories / baseCalories;
+  
+  // LIMITES DINÂMICOS BASEADOS NAS CALORIAS TOTAIS DIÁRIAS
+  let maxMultiplier: number;
+  
+  if (dailyCalories <= 1500) {
+    maxMultiplier = 1.5;
+  } else if (dailyCalories <= 2000) {
+    maxMultiplier = 2.0;
+  } else if (dailyCalories <= 2500) {
+    maxMultiplier = 2.5;
+  } else if (dailyCalories <= 3000) {
+    maxMultiplier = 3.0;
+  } else if (dailyCalories <= 3500) {
+    maxMultiplier = 3.5;
+  } else {
+    maxMultiplier = 4.0;
+  }
+  
+  // APLICAR LIMITES POR CATEGORIA
+  if (foodCategory === 'protein') {
+    multiplier = Math.max(0.8, Math.min(maxMultiplier, multiplier));
+  } else if (foodCategory === 'carb') {
+    multiplier = Math.max(0.8, Math.min(maxMultiplier, multiplier));
+  } else if (foodCategory === 'fat') {
+    // Gorduras crescem menos
+    multiplier = Math.max(1.0, Math.min(maxMultiplier * 0.5, multiplier));
+  } else if (foodCategory === 'fruit' || foodCategory === 'dairy' || foodCategory === 'legume') {
+    multiplier = 1; // Sempre 1 porção para esses, conforme a lógica de targetFoodCalories = baseCalories
+  }
+  
+  // Calcular calorias reais
   const actualCalories = Math.round(baseCalories * multiplier);
   
-  // FORMATAR QUANTIDADE BASEADO NO TIPO DE PORÇÃO
+  // FORMATAR QUANTIDADE BASEADO NO TIPO DE ALIMENTO
   let quantityText = '';
   
-  // CASO 1: UNIDADES (ovos, frutas)
-  if (portionDesc.includes('unidade')) {
+  // TAPIOCA - SEMPRE EM GRAMAS
+  if (food.id === 'tapioca' || food.name.toLowerCase().includes('tapioca')) {
+    const grams = Math.round(basePortion * multiplier / 10) * 10;
+    quantityText = `${grams}g`;
+  }
+  
+  // UNIDADES (ovos, frutas)
+  else if (portionDesc.includes('unidade') && !food.name.toLowerCase().includes('tapioca')) {
     const units = Math.max(1, Math.round(multiplier));
     quantityText = `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
   }
   
-  // CASO 2: FATIAS (pães, queijos)
+  // FATIAS (pães, queijos)
   else if (portionDesc.includes('fatia')) {
     const slices = Math.max(1, Math.round(multiplier * 2));
     quantityText = `${slices} ${slices === 1 ? 'fatia' : 'fatias'}`;
   }
   
-  // CASO 3: COLHERES DE SOPA (pasta amendoim, aveia, azeite)
-  else if (portionDesc.includes('colher de sopa')) {
+  // COLHERES DE SOPA
+  else if (portionDesc.includes('colher de sopa') || portionDesc.includes('colher')) {
     const spoons = Math.max(1, Math.round(multiplier));
     quantityText = `${spoons} ${spoons === 1 ? 'colher de sopa' : 'colheres de sopa'}`;
   }
   
-  // CASO 4: COLHERES (genérico)
-  else if (portionDesc.includes('colher')) {
-    const spoons = Math.max(1, Math.round(multiplier));
-    quantityText = `${spoons} colher${spoons > 1 ? 'es' : ''} de sopa`;
-  }
-  
-  // CASO 5: ML (leites, iogurtes líquidos)
-  else if (food.portion.unit === 'ml') {
-    const ml = Math.round(basePortion * multiplier / 50) * 50; // Arredondar para 50ml
-    quantityText = `${ml}ml`;
-  }
-  
-  // CASO 6: GRAMAS (proteínas almoço/jantar, carboidratos almoço/jantar)
-  else if (food.portion.unit === 'g') {
-    // Para proteínas e carbs de almoço/jantar, usar gramas
-    if (food.mealGroup.includes('lunch') || food.mealGroup.includes('dinner')) {
-      const grams = Math.round(basePortion * multiplier / 10) * 10; // Arredondar para 10g
-      quantityText = `${grams}g`;
-    } 
-    // Para café/lanche, tentar usar descrição original se não caiu em nenhum caso acima
-    else {
-      quantityText = portionDesc;
-    }
-  }
-  
-  // CASO 7: SCOOP (whey protein)
+  // SCOOP (whey)
   else if (portionDesc.includes('scoop')) {
     const scoops = Math.max(1, Math.round(multiplier));
     quantityText = `${scoops} ${scoops === 1 ? 'scoop' : 'scoops'}`;
   }
   
-  // CASO PADRÃO: usar descrição original
+  // ML (leites, iogurtes)
+  else if (food.portion.unit === 'ml') {
+    const ml = Math.round(basePortion * multiplier / 50) * 50;
+    quantityText = `${ml}ml`;
+  }
+  
+  // GRAMAS
+  else if (food.portion.unit === 'g') {
+    const grams = Math.round(basePortion * multiplier / 10) * 10;
+    quantityText = `${grams}g`;
+  }
+  
+  // PADRÃO
   else {
     quantityText = portionDesc;
   }
