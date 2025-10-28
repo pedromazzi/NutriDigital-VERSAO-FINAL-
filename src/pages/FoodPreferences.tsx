@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Coffee, UtensilsCrossed, Cookie, Moon, Check, AlertCircle } from 'lucide-react';
+import { Coffee, UtensilsCrossed, Cookie, Moon, Check, AlertCircle, Dumbbell, Wheat, Apple, Milk, Droplets, Leaf } from 'lucide-react'; // Adicionado Apple, Milk, Leaf
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
-import { FOOD_DATABASE, filterByIntolerances, getFoodsByMeal } from '@/utils/fooddatabase';
+import { FOOD_DATABASE, filterByIntolerances, getFoodsByMeal } from '@/utils/foodDatabase';
 
 interface UserData {
   userName?: string;
@@ -33,9 +33,9 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
   const [activeTab, setActiveTab] = useState('breakfast');
   
   const [selectedFoods, setSelectedFoods] = useState({
-    breakfast: { proteins: [], carbs: [], fruits: [], dairy: [], fats: [] },
+    breakfast: { proteins: [], carbs: [], fruits: [], dairy: [], fats: [], legumes: [] }, // Adicionado legumes
     lunch: { proteins: [], carbs: [], legumes: [], fats: [] },
-    snack: { proteins: [], carbs: [], fruits: [], dairy: [], fats: [] },
+    snack: { proteins: [], carbs: [], fruits: [], dairy: [], fats: [], legumes: [] }, // Adicionado legumes
     dinner: { proteins: [], carbs: [], legumes: [], fats: [] }
   });
   
@@ -71,69 +71,73 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
 
   const activeMeal = meals.find(m => m.id === activeTab)!;
 
+  // Nova estrutura de categorias
+  const categories = [
+    {
+      id: 'proteins',
+      name: 'Proteínas',
+      icon: Dumbbell,
+      color: 'text-primary',
+      description: 'Essenciais para construção muscular',
+      required: true,
+      mealTypes: ['breakfast', 'lunch', 'snack', 'dinner'],
+      foods: FOOD_DATABASE.breakfast_proteins.concat(FOOD_DATABASE.lunch_proteins) // Combinar para facilitar
+    },
+    {
+      id: 'carbs',
+      name: 'Carboidratos',
+      icon: Wheat,
+      color: 'text-red-500',
+      description: 'Principal fonte de energia',
+      required: true,
+      mealTypes: ['breakfast', 'lunch', 'snack', 'dinner'],
+      foods: FOOD_DATABASE.breakfast_carbs.concat(FOOD_DATABASE.lunch_carbs) // Combinar para facilitar
+    },
+    {
+      id: 'fruits',
+      name: 'Frutas',
+      icon: Apple,
+      color: 'text-green-500',
+      description: 'Vitaminas e fibras naturais',
+      required: true,
+      mealTypes: ['breakfast', 'snack'],
+      foods: FOOD_DATABASE.fruits
+    },
+    {
+      id: 'dairy',
+      name: 'Laticínios',
+      icon: Milk,
+      color: 'text-blue-500',
+      description: 'Cálcio e proteínas adicionais',
+      required: false,
+      mealTypes: ['breakfast', 'snack'],
+      foods: FOOD_DATABASE.dairy
+    },
+    {
+      id: 'fats',
+      name: 'Gorduras Boas',
+      icon: Droplets,
+      color: 'text-yellow-600',
+      description: 'Absorção de vitaminas e energia',
+      required: true,
+      mealTypes: ['lunch', 'dinner'],
+      foods: FOOD_DATABASE.fats
+    },
+    {
+      id: 'legumes',
+      name: 'Leguminosas',
+      icon: Leaf,
+      color: 'text-amber-700',
+      description: 'Fibras e proteínas vegetais',
+      required: false,
+      mealTypes: ['lunch', 'dinner'],
+      foods: FOOD_DATABASE.legumes
+    }
+  ];
+
   // Obter categorias de alimentos para a refeição ativa
   const getMealCategories = () => {
-    if (activeTab === 'breakfast' || activeTab === 'snack') {
-      return [
-        { 
-          id: 'proteins', 
-          name: 'Proteínas', 
-          foods: FOOD_DATABASE.breakfast_proteins,
-          required: true 
-        },
-        { 
-          id: 'carbs', 
-          name: 'Carboidratos', 
-          foods: FOOD_DATABASE.breakfast_carbs,
-          required: true 
-        },
-        { 
-          id: 'fruits', 
-          name: 'Frutas', 
-          foods: FOOD_DATABASE.fruits,
-          required: true 
-        },
-        { 
-          id: 'dairy', 
-          name: 'Laticínios', 
-          foods: FOOD_DATABASE.dairy,
-          required: false 
-        },
-        { 
-          id: 'fats', 
-          name: 'Gorduras Boas', 
-          foods: FOOD_DATABASE.fats,
-          required: false 
-        }
-      ];
-    } else {
-      return [
-        { 
-          id: 'proteins', 
-          name: 'Proteínas', 
-          foods: FOOD_DATABASE.lunch_proteins,
-          required: true 
-        },
-        { 
-          id: 'carbs', 
-          name: 'Carboidratos', 
-          foods: FOOD_DATABASE.lunch_carbs,
-          required: true 
-        },
-        { 
-          id: 'legumes', 
-          name: 'Leguminosas', 
-          foods: FOOD_DATABASE.legumes,
-          required: false 
-        },
-        { 
-          id: 'fats', 
-          name: 'Gorduras Boas', 
-          foods: FOOD_DATABASE.fats,
-          required: false 
-        }
-      ];
-    }
+    return categories.filter(category => category.mealTypes.includes(activeTab));
   };
 
   // Filtrar alimentos por intolerância
@@ -141,20 +145,29 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
     return filterByIntolerances(foods, intolerances);
   };
 
-  // Selecionar/desselecionar alimento
+  // Selecionar/desselecionar alimento - TODAS as categorias permitem apenas 1 seleção
   const toggleFood = (categoryId: string, foodId: string) => {
     setSelectedFoods(prev => {
       const mealFoods = prev[activeTab as keyof typeof prev];
       const categoryFoods = mealFoods[categoryId as keyof typeof mealFoods] as string[];
-      const isSelected = categoryFoods.includes(foodId);
       
+      // Se já está selecionado, desseleciona
+      if (categoryFoods.includes(foodId)) {
+        return {
+          ...prev,
+          [activeTab]: {
+            ...mealFoods,
+            [categoryId]: []
+          }
+        };
+      }
+      
+      // Senão, substitui qualquer seleção anterior (apenas 1 permitido em TODAS as categorias)
       return {
         ...prev,
         [activeTab]: {
           ...mealFoods,
-          [categoryId]: isSelected
-            ? categoryFoods.filter(f => f !== foodId)
-            : [...categoryFoods, foodId]
+          [categoryId]: [foodId]
         }
       };
     });
@@ -203,30 +216,42 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
     
     for (const meal of mealsToValidate) {
       const mealData = selectedFoods[meal as keyof typeof selectedFoods];
+      const mealName = meals.find(m => m.id === meal)?.name;
       
-      // Verificar proteínas (obrigatório)
+      // PROTEÍNAS - Obrigatório em TODAS as refeições
       if (mealData.proteins.length === 0) {
         return {
           valid: false,
-          message: `Selecione pelo menos 1 proteína para ${meals.find(m => m.id === meal)?.name}`
+          message: `Selecione 1 proteína para ${mealName}`
         };
       }
       
-      // Verificar carboidratos (obrigatório)
+      // CARBOIDRATOS - Obrigatório em TODAS as refeições
       if (mealData.carbs.length === 0) {
         return {
           valid: false,
-          message: `Selecione pelo menos 1 carboidrato para ${meals.find(m => m.id === meal)?.name}`
+          message: `Selecione 1 carboidrato para ${mealName}`
         };
       }
       
-      // Verificar frutas (obrigatório para café e lanche)
+      // FRUTAS - Obrigatório apenas em café e lanche
       if ((meal === 'breakfast' || meal === 'snack') && mealData.fruits.length === 0) {
         return {
           valid: false,
-          message: `Selecione pelo menos 1 fruta para ${meals.find(m => m.id === meal)?.name}`
+          message: `Selecione 1 fruta para ${mealName}`
         };
       }
+      
+      // GORDURAS - Obrigatório apenas em almoço e jantar
+      if ((meal === 'lunch' || meal === 'dinner') && mealData.fats.length === 0) {
+        return {
+          valid: false,
+          message: `Selecione 1 gordura boa para ${mealName}`
+        };
+      }
+      
+      // LATICÍNIOS - Opcional (não valida)
+      // LEGUMINOSAS - Opcional (não valida)
     }
     
     return { valid: true, message: '' };
@@ -287,7 +312,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
               {getTotalSelectedFoods()} alimentos selecionados no total
             </p>
             <p className="text-sm text-text-secondary">
-              Selecione pelo menos 1 proteína e 1 carboidrato por refeição
+              Escolha 1 alimento por categoria. Laticínios e leguminosas são opcionais.
             </p>
           </div>
         </div>
@@ -435,9 +460,14 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
                           >
                             <div className="flex items-center justify-between gap-2">
                               <span className="flex-1">{food.name}</span>
-                              {isSelected && (
-                                <Check className="w-4 h-4 flex-shrink-0" />
-                              )}
+                              {/* Radio button para TODAS as categorias (apenas 1 seleção) */}
+                              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                isSelected ? 'border-primary bg-primary' : 'border-gray-300'
+                              }`}>
+                                {isSelected && (
+                                  <div className="w-2 h-2 rounded-full bg-white" />
+                                )}
+                              </div>
                             </div>
                           </button>
                         );

@@ -220,16 +220,27 @@ function buildMeal(
     }
   }
   
-  // OPCIONAL: GORDURA BOA
-  if (preferences.fats && preferences.fats.length > 0) {
+  // GORDURA BOA - Obrigatória em almoço e jantar, NÃO aparece em café/lanche
+  if (mealType === 'lunch' || mealType === 'dinner') {
+    // Usuário DEVE ter selecionado (validação garante isso)
     const fatFood = selectFood(preferences.fats, availableFoods.fats);
     
-    if (fatFood && (currentCalories + fatFood.nutrition.calories) <= mealTargetCalories + 50) {
+    if (fatFood) {
       const fatPortion = calculatePortion(fatFood, mealTargetCalories, dailyCalories, fatFood.category);
       foods.push(fatPortion);
       currentCalories += fatPortion.calories;
+    } else {
+      // Fallback: se por algum motivo não encontrar, adiciona azeite
+      console.warn('⚠️ Gordura não encontrada, adicionando azeite como fallback');
+      const azeite = availableFoods.fats.find(f => f.id === 'azeite');
+      if (azeite) {
+        const azeitePortion = calculatePortion(azeite, mealTargetCalories, dailyCalories, azeite.category);
+        foods.push(azeitePortion);
+        currentCalories += azeitePortion.calories;
+      }
     }
   }
+  // NÃO adicionar gordura em café da manhã e lanche
   
   // ADICIONAR VEGETAIS (almoço e jantar)
   if (mealType === 'lunch' || mealType === 'dinner') {
