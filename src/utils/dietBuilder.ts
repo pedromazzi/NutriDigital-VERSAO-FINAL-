@@ -184,79 +184,91 @@ function compensateMissingCalories(foods: FoodInMeal[], targetCalories: number, 
   // COMPENSAR PROTEÍNA
   const proteinFood = foods[proteinIndex];
   const newProteinCalories = proteinFood.calories + proteinExtra;
-  
+
+  // Criar novo objeto com quantidade atualizada
+  let newProteinFood = { ...proteinFood }; // Copiar todas as propriedades
+
   // Calcular nova quantidade de proteína
   if (proteinFood.quantity.includes('unidade')) {
     // Ovos
     const currentUnits = parseInt(proteinFood.quantity) || 1;
     const caloriesPerUnit = proteinFood.calories / currentUnits;
     const newUnits = Math.round(newProteinCalories / caloriesPerUnit);
-    foods[proteinIndex].quantity = `${newUnits} ${newUnits === 1 ? 'unidade' : 'unidades'}`;
-    foods[proteinIndex].calories = newProteinCalories;
+    newProteinFood.quantity = `${newUnits} ${newUnits === 1 ? 'unidade' : 'unidades'}`;
+    newProteinFood.calories = newProteinCalories;
   } else if (proteinFood.quantity.includes('g')) {
     // Gramas (frango, peixe, etc)
     const currentGrams = parseInt(proteinFood.quantity);
     const caloriesPer100g = (proteinFood.calories / currentGrams) * 100;
     const newGrams = Math.round((newProteinCalories / caloriesPer100g) * 100 / 10) * 10;
-    foods[proteinIndex].quantity = `${newGrams}g`;
-    foods[proteinIndex].calories = newProteinCalories;
+    newProteinFood.quantity = `${newGrams}g`;
+    newProteinFood.calories = newProteinCalories;
   } else if (proteinFood.quantity.includes('fatia')) {
     // Fatias (queijo)
     const currentSlices = parseInt(proteinFood.quantity) || 1;
     const caloriesPerSlice = proteinFood.calories / currentSlices;
     const newSlices = Math.round(newProteinCalories / caloriesPerSlice);
-    foods[proteinIndex].quantity = `${newSlices} ${newSlices === 1 ? 'fatia' : 'fatias'}`;
-    foods[proteinIndex].calories = newProteinCalories;
+    newProteinFood.quantity = `${newSlices} ${newSlices === 1 ? 'fatia' : 'fatias'}`;
+    newProteinFood.calories = newProteinCalories;
   } else if (proteinFood.quantity.includes('scoop')) {
     // Scoops (whey)
     const currentScoops = parseInt(proteinFood.quantity) || 1;
     const caloriesPerScoop = proteinFood.calories / currentScoops;
     const newScoops = Math.round(newProteinCalories / caloriesPerScoop);
-    foods[proteinIndex].quantity = `${newScoops} ${newScoops === 1 ? 'scoop' : 'scoops'}`;
-    foods[proteinIndex].calories = newProteinCalories;
+    newProteinFood.quantity = `${newScoops} ${newScoops === 1 ? 'scoop' : 'scoops'}`;
+    newProteinFood.calories = newProteinCalories;
   } else if (proteinFood.quantity.includes('ml')) {
     // ML (iogurte líquido)
     const currentMl = parseInt(proteinFood.quantity);
     const caloriesPer100ml = (proteinFood.calories / currentMl) * 100;
     const newMl = Math.round((newProteinCalories / caloriesPer100ml) * 100 / 50) * 50;
-    foods[proteinIndex].quantity = `${newMl}ml`;
-    foods[proteinIndex].calories = newProteinCalories;
+    newProteinFood.quantity = `${newMl}ml`;
+    newProteinFood.calories = newProteinCalories;
   }
+
+  // Substituir o objeto no array
+  foods[proteinIndex] = newProteinFood;
   
   // COMPENSAR CARBOIDRATO
   const carboFood = foods[carbIndex];
   const newCarboCalories = carboFood.calories + carboExtra;
-  
+
+  // Criar novo objeto com quantidade atualizada
+  let newCarboFood = { ...carboFood }; // Copiar todas as propriedades
+
   // Calcular nova quantidade de carboidrato
   if (carboFood.quantity.includes('unidade')) {
     // Pães em unidade
     const currentUnits = parseInt(carboFood.quantity) || 1;
     const caloriesPerUnit = carboFood.calories / currentUnits;
     const newUnits = Math.round(newCarboCalories / caloriesPerUnit);
-    foods[carbIndex].quantity = `${newUnits} ${newUnits === 1 ? 'unidade' : 'unidades'}`;
-    foods[carbIndex].calories = newCarboCalories;
+    newCarboFood.quantity = `${newUnits} ${newUnits === 1 ? 'unidade' : 'unidades'}`;
+    newCarboFood.calories = newCarboCalories;
   } else if (carboFood.quantity.includes('fatia')) {
     // Pães em fatias
     const currentSlices = parseInt(carboFood.quantity) || 1;
     const caloriesPerSlice = carboFood.calories / currentSlices;
     const newSlices = Math.round(newCarboCalories / caloriesPerSlice);
-    foods[carbIndex].quantity = `${newSlices} ${newSlices === 1 ? 'fatia' : 'fatias'}`;
-    foods[carbIndex].calories = newCarboCalories;
+    newCarboFood.quantity = `${newSlices} ${newSlices === 1 ? 'fatia' : 'fatias'}`;
+    newCarboFood.calories = newCarboCalories;
   } else if (carboFood.quantity.includes('g')) {
     // Gramas (arroz, batata, etc)
     const currentGrams = parseInt(carboFood.quantity);
     const caloriesPer100g = (carboFood.calories / currentGrams) * 100;
     const newGrams = Math.round((newCarboCalories / caloriesPer100g) * 100 / 10) * 10;
-    foods[carbIndex].quantity = `${newGrams}g`;
-    foods[carbIndex].calories = newCarboCalories;
+    newCarboFood.quantity = `${newGrams}g`;
+    newCarboFood.calories = newCarboCalories;
   } else if (carboFood.quantity.includes('colher')) {
     // Colheres (aveia)
     const currentSpoons = parseInt(carboFood.quantity) || 1;
     const caloriesPerSpoon = carboFood.calories / currentSpoons;
     const newSpoons = Math.round(newCarboCalories / caloriesPerSpoon);
-    foods[carbIndex].quantity = `${newSpoons} ${newSpoons === 1 ? 'colher de sopa' : 'colheres de sopa'}`;
-    foods[carbIndex].calories = newCarboCalories;
+    newCarboFood.quantity = `${newSpoons} ${newSpoons === 1 ? 'colher de sopa' : 'colheres de sopa'}`;
+    newCarboFood.calories = newCarboCalories;
   }
+
+  // Substituir o objeto no array
+  foods[carbIndex] = newCarboFood;
   
   const newTotal = foods.reduce((sum, food) => sum + food.calories, 0);
   console.log(`✅ Compensação concluída: ${currentCalories} → ${newTotal} kcal (meta: ${targetCalories})`);
@@ -276,7 +288,7 @@ function buildMeal(
 ): MealPlan {
   console.log(`🍽️ Montando ${name} (${mealTargetCalories} kcal)...`);
   
-  const foods: FoodInMeal[] = [];
+  let foods: FoodInMeal[] = []; // ← MUDOU DE const PARA let
   let currentCalories = 0;
   
   // OBRIGATÓRIO 1: PROTEÍNA
