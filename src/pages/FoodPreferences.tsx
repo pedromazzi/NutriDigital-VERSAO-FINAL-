@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Coffee, UtensilsCrossed, Cookie, Moon, Check, AlertCircle, Dumbbell, Wheat, Apple, Milk, Droplets, Leaf } from 'lucide-react'; // Adicionado Apple, Milk, Leaf
+import { Coffee, UtensilsCrossed, Cookie, Moon, Check, AlertCircle, Dumbbell, Wheat, Apple, Milk, Droplets, Leaf } from 'lucide-react';
 import Button from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import Card from '@/components/Card';
-import { FOOD_DATABASE, filterByIntolerances, getFoodsByMeal } from '@/utils/foodDatabase';
+import { FOOD_DATABASE, filterByIntolerances, getFoodsByMeal, FoodItem, MealGroup } from '@/utils/foodDatabase'; // Adicionado FoodItem e MealGroup
 
 interface UserData {
   userName?: string;
@@ -33,9 +33,9 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
   const [activeTab, setActiveTab] = useState('breakfast');
   
   const [selectedFoods, setSelectedFoods] = useState({
-    breakfast: { proteins: [], carbs: [], fruits: [], dairy: [], fats: [], legumes: [] }, // Adicionado legumes
+    breakfast: { proteins: [], carbs: [], fruits: [], dairy: [], fats: [], legumes: [] },
     lunch: { proteins: [], carbs: [], legumes: [], fats: [] },
-    snack: { proteins: [], carbs: [], fruits: [], dairy: [], fats: [], legumes: [] }, // Adicionado legumes
+    snack: { proteins: [], carbs: [], fruits: [], dairy: [], fats: [], legumes: [] },
     dinner: { proteins: [], carbs: [], legumes: [], fats: [] }
   });
   
@@ -81,7 +81,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
       description: 'Essenciais para construção muscular',
       required: true,
       mealTypes: ['breakfast', 'lunch', 'snack', 'dinner'],
-      foods: FOOD_DATABASE.breakfast_proteins.concat(FOOD_DATABASE.lunch_proteins) // Combinar para facilitar
+      foods: FOOD_DATABASE.breakfast_proteins.concat(FOOD_DATABASE.lunch_proteins)
     },
     {
       id: 'carbs',
@@ -91,7 +91,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
       description: 'Principal fonte de energia',
       required: true,
       mealTypes: ['breakfast', 'lunch', 'snack', 'dinner'],
-      foods: FOOD_DATABASE.breakfast_carbs.concat(FOOD_DATABASE.lunch_carbs) // Combinar para facilitar
+      foods: FOOD_DATABASE.breakfast_carbs.concat(FOOD_DATABASE.lunch_carbs)
     },
     {
       id: 'fruits',
@@ -140,9 +140,18 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
     return categories.filter(category => category.mealTypes.includes(activeTab));
   };
 
-  // Filtrar alimentos por intolerância
-  const getFilteredFoods = (foods: any[]) => {
-    return filterByIntolerances(foods, intolerances);
+  // Filtrar alimentos por tipo de refeição e intolerâncias
+  const getFilteredFoods = (foods: FoodItem[]) => {
+    // 1. Filtrar por tipo de refeição (activeTab)
+    const mealFiltered = foods.filter(food => {
+      if (!food.mealGroup || food.mealGroup.length === 0) {
+        return true; // Fallback: se não tem mealGroup definido, mostrar em todos
+      }
+      return food.mealGroup.includes(activeTab as MealGroup);
+    });
+
+    // 2. Aplicar filtro de intolerâncias
+    return filterByIntolerances(mealFiltered, intolerances);
   };
 
   // Selecionar/desselecionar alimento - TODAS as categorias permitem apenas 1 seleção
@@ -422,7 +431,7 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
           {/* Renderizar cada categoria com seus alimentos */}
           <div className="space-y-6">
             {getMealCategories().map((category) => {
-              const filteredFoods = getFilteredFoods(category.foods);
+              const finalFilteredFoods = getFilteredFoods(category.foods); // Usando a função de filtro atualizada
               
               return (
                 <div key={category.id}>
@@ -443,9 +452,9 @@ const FoodPreferences: React.FC<FoodPreferencesProps> = ({ userData, updateUserD
                   </div>
                   
                   {/* Grid de Alimentos */}
-                  {filteredFoods.length > 0 ? (
+                  {finalFilteredFoods.length > 0 ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {filteredFoods.map((food) => {
+                      {finalFilteredFoods.map((food) => {
                         const isSelected = isFoodSelected(category.id, food.id);
                         
                         return (
