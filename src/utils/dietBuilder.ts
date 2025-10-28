@@ -135,6 +135,135 @@ function filterFoodsByIntolerance(intolerances: string[]): FoodDatabaseType {
   return allFoods;
 }
 
+// 🔄 COMPENSAR CALORIAS FALTANTES AUMENTANDO PROTEÍNA E CARBOIDRATO
+function compensateMissingCalories(foods: FoodInMeal[], targetCalories: number, currentCalories: number, dailyCalories: number, mealType: MealGroup): FoodInMeal[] {
+  const missingCalories = targetCalories - currentCalories;
+  
+  // Se faltam menos de 50 kcal, não compensa (margem de erro aceitável)
+  if (missingCalories < 50) {
+    console.log(`✅ Calorias OK: ${currentCalories}/${targetCalories} (diferença: ${missingCalories} kcal)`);
+    return foods;
+  }
+  
+  console.log(`⚠️ Faltam ${missingCalories} kcal. Compensando...`);
+  
+  // Encontrar índices de proteína e carboidrato
+  let proteinIndex = -1;
+  let carbIndex = -1;
+  
+  foods.forEach((food, index) => {
+    // Identificar proteína por palavras-chave
+    if (food.name.includes('ovo') || food.name.includes('frango') || 
+        food.name.includes('peixe') || food.name.includes('carne') ||
+        food.name.includes('tilápia') || food.name.includes('salmão') ||
+        food.name.includes('atum') || food.name.includes('queijo') ||
+        food.name.includes('whey') || food.name.includes('iogurte') ||
+        food.name.includes('requeijão') || food.name.includes('tofu') ||
+        food.name.includes('soja')) {
+      if (proteinIndex === -1) proteinIndex = index;
+    }
+    
+    // Identificar carboidrato por palavras-chave
+    if (food.name.includes('pão') || food.name.includes('arroz') ||
+        food.name.includes('batata') || food.name.includes('macarrão') ||
+        food.name.includes('aveia') || food.name.includes('tapioca') ||
+        food.name.includes('granola') || food.name.includes('cuscuz')) {
+      if (carbIndex === -1) carbIndex = index;
+    }
+  });
+  
+  if (proteinIndex === -1 || carbIndex === -1) {
+    console.warn('❌ Não encontrou proteína ou carboidrato para compensar');
+    return foods;
+  }
+  
+  // Distribuir calorias faltantes: 50% proteína, 50% carboidrato
+  const proteinExtra = Math.round(missingCalories * 0.50);
+  const carboExtra = Math.round(missingCalories * 0.50);
+  
+  // COMPENSAR PROTEÍNA
+  const proteinFood = foods[proteinIndex];
+  const newProteinCalories = proteinFood.calories + proteinExtra;
+  
+  // Calcular nova quantidade de proteína
+  if (proteinFood.quantity.includes('unidade')) {
+    // Ovos
+    const currentUnits = parseInt(proteinFood.quantity) || 1;
+    const caloriesPerUnit = proteinFood.calories / currentUnits;
+    const newUnits = Math.round(newProteinCalories / caloriesPerUnit);
+    foods[proteinIndex].quantity = `${newUnits} ${newUnits === 1 ? 'unidade' : 'unidades'}`;
+    foods[proteinIndex].calories = newProteinCalories;
+  } else if (proteinFood.quantity.includes('g')) {
+    // Gramas (frango, peixe, etc)
+    const currentGrams = parseInt(proteinFood.quantity);
+    const caloriesPer100g = (proteinFood.calories / currentGrams) * 100;
+    const newGrams = Math.round((newProteinCalories / caloriesPer100g) * 100 / 10) * 10;
+    foods[proteinIndex].quantity = `${newGrams}g`;
+    foods[proteinIndex].calories = newProteinCalories;
+  } else if (proteinFood.quantity.includes('fatia')) {
+    // Fatias (queijo)
+    const currentSlices = parseInt(proteinFood.quantity) || 1;
+    const caloriesPerSlice = proteinFood.calories / currentSlices;
+    const newSlices = Math.round(newProteinCalories / caloriesPerSlice);
+    foods[proteinIndex].quantity = `${newSlices} ${newSlices === 1 ? 'fatia' : 'fatias'}`;
+    foods[proteinIndex].calories = newProteinCalories;
+  } else if (proteinFood.quantity.includes('scoop')) {
+    // Scoops (whey)
+    const currentScoops = parseInt(proteinFood.quantity) || 1;
+    const caloriesPerScoop = proteinFood.calories / currentScoops;
+    const newScoops = Math.round(newProteinCalories / caloriesPerScoop);
+    foods[proteinIndex].quantity = `${newScoops} ${newScoops === 1 ? 'scoop' : 'scoops'}`;
+    foods[proteinIndex].calories = newProteinCalories;
+  } else if (proteinFood.quantity.includes('ml')) {
+    // ML (iogurte líquido)
+    const currentMl = parseInt(proteinFood.quantity);
+    const caloriesPer100ml = (proteinFood.calories / currentMl) * 100;
+    const newMl = Math.round((newProteinCalories / caloriesPer100ml) * 100 / 50) * 50;
+    foods[proteinIndex].quantity = `${newMl}ml`;
+    foods[proteinIndex].calories = newProteinCalories;
+  }
+  
+  // COMPENSAR CARBOIDRATO
+  const carboFood = foods[carbIndex];
+  const newCarboCalories = carboFood.calories + carboExtra;
+  
+  // Calcular nova quantidade de carboidrato
+  if (carboFood.quantity.includes('unidade')) {
+    // Pães em unidade
+    const currentUnits = parseInt(carboFood.quantity) || 1;
+    const caloriesPerUnit = carboFood.calories / currentUnits;
+    const newUnits = Math.round(newCarboCalories / caloriesPerUnit);
+    foods[carbIndex].quantity = `${newUnits} ${newUnits === 1 ? 'unidade' : 'unidades'}`;
+    foods[carbIndex].calories = newCarboCalories;
+  } else if (carboFood.quantity.includes('fatia')) {
+    // Pães em fatias
+    const currentSlices = parseInt(carboFood.quantity) || 1;
+    const caloriesPerSlice = carboFood.calories / currentSlices;
+    const newSlices = Math.round(newCarboCalories / caloriesPerSlice);
+    foods[carbIndex].quantity = `${newSlices} ${newSlices === 1 ? 'fatia' : 'fatias'}`;
+    foods[carbIndex].calories = newCarboCalories;
+  } else if (carboFood.quantity.includes('g')) {
+    // Gramas (arroz, batata, etc)
+    const currentGrams = parseInt(carboFood.quantity);
+    const caloriesPer100g = (carboFood.calories / currentGrams) * 100;
+    const newGrams = Math.round((newCarboCalories / caloriesPer100g) * 100 / 10) * 10;
+    foods[carbIndex].quantity = `${newGrams}g`;
+    foods[carbIndex].calories = newCarboCalories;
+  } else if (carboFood.quantity.includes('colher')) {
+    // Colheres (aveia)
+    const currentSpoons = parseInt(carboFood.quantity) || 1;
+    const caloriesPerSpoon = carboFood.calories / currentSpoons;
+    const newSpoons = Math.round(newCarboCalories / caloriesPerSpoon);
+    foods[carbIndex].quantity = `${newSpoons} ${newSpoons === 1 ? 'colher de sopa' : 'colheres de sopa'}`;
+    foods[carbIndex].calories = newCarboCalories;
+  }
+  
+  const newTotal = foods.reduce((sum, food) => sum + food.calories, 0);
+  console.log(`✅ Compensação concluída: ${currentCalories} → ${newTotal} kcal (meta: ${targetCalories})`);
+  
+  return foods;
+}
+
 // 🍽️ MONTAR UMA REFEIÇÃO
 function buildMeal(
   name: string,
@@ -159,7 +288,7 @@ function buildMeal(
   );
   
   if (proteinFood) {
-    const proteinPortion = calculatePortion(proteinFood, mealTargetCalories, dailyCalories, proteinFood.category);
+    const proteinPortion = calculatePortion(proteinFood, mealTargetCalories, dailyCalories, proteinFood.category, mealType);
     foods.push({
       ...proteinPortion,
       substitution: findSubstitution(proteinFood, mealType, availableFoods)
@@ -176,7 +305,7 @@ function buildMeal(
   );
   
   if (carbFood) {
-    const carbPortion = calculatePortion(carbFood, mealTargetCalories, dailyCalories, carbFood.category);
+    const carbPortion = calculatePortion(carbFood, mealTargetCalories, dailyCalories, carbFood.category, mealType);
     foods.push({
       ...carbPortion,
       substitution: findSubstitution(carbFood, mealType, availableFoods)
@@ -189,7 +318,7 @@ function buildMeal(
     const fruitFood = selectFood(preferences.fruits, availableFoods.fruits);
     
     if (fruitFood) {
-      const fruitPortion = calculatePortion(fruitFood, mealTargetCalories, dailyCalories, fruitFood.category);
+      const fruitPortion = calculatePortion(fruitFood, mealTargetCalories, dailyCalories, fruitFood.category, mealType);
       foods.push({
         ...fruitPortion,
         substitution: findFruitSubstitution(fruitFood, availableFoods.fruits)
@@ -203,7 +332,7 @@ function buildMeal(
     const dairyFood = selectFood(preferences.dairy, availableFoods.dairy);
     
     if (dairyFood && (currentCalories + dairyFood.nutrition.calories) <= mealTargetCalories + 50) {
-      const dairyPortion = calculatePortion(dairyFood, mealTargetCalories, dailyCalories, dairyFood.category);
+      const dairyPortion = calculatePortion(dairyFood, mealTargetCalories, dailyCalories, dairyFood.category, mealType);
       foods.push(dairyPortion);
       currentCalories += dairyPortion.calories;
     }
@@ -214,7 +343,7 @@ function buildMeal(
     const legumeFood = selectFood(preferences.legumes, availableFoods.legumes);
     
     if (legumeFood && (currentCalories + legumeFood.nutrition.calories) <= mealTargetCalories + 50) {
-      const legumePortion = calculatePortion(legumeFood, mealTargetCalories, dailyCalories, legumeFood.category);
+      const legumePortion = calculatePortion(legumeFood, mealTargetCalories, dailyCalories, legumeFood.category, mealType);
       foods.push(legumePortion);
       currentCalories += legumePortion.calories;
     }
@@ -226,7 +355,7 @@ function buildMeal(
     const fatFood = selectFood(preferences.fats, availableFoods.fats);
     
     if (fatFood) {
-      const fatPortion = calculatePortion(fatFood, mealTargetCalories, dailyCalories, fatFood.category);
+      const fatPortion = calculatePortion(fatFood, mealTargetCalories, dailyCalories, fatFood.category, mealType);
       foods.push(fatPortion);
       currentCalories += fatPortion.calories;
     } else {
@@ -234,7 +363,7 @@ function buildMeal(
       console.warn('⚠️ Gordura não encontrada, adicionando azeite como fallback');
       const azeite = availableFoods.fats.find(f => f.id === 'azeite');
       if (azeite) {
-        const azeitePortion = calculatePortion(azeite, mealTargetCalories, dailyCalories, azeite.category);
+        const azeitePortion = calculatePortion(azeite, mealTargetCalories, dailyCalories, azeite.category, mealType);
         foods.push(azeitePortion);
         currentCalories += azeitePortion.calories;
       }
@@ -252,7 +381,13 @@ function buildMeal(
     });
   }
   
-  console.log(`✅ ${name} montado com ${currentCalories} kcal`);
+  // APLICAR COMPENSAÇÃO AUTOMÁTICA DE CALORIAS
+  foods = compensateMissingCalories(foods, mealTargetCalories, currentCalories, dailyCalories, mealType);
+  
+  // Recalcular calorias totais após compensação
+  currentCalories = foods.reduce((sum, food) => sum + food.calories, 0);
+  
+  console.log(`✅ ${name} montado com ${currentCalories} kcal (meta: ${mealTargetCalories})`);
   
   return {
     name,
@@ -276,24 +411,70 @@ function selectFood(selectedIds: string[] | undefined, availableFoods: FoodItem[
 }
 
 // ⚖️ CALCULAR PORÇÃO COM LIMITES DINÂMICOS BASEADOS NO OBJETIVO CALÓRICO
-function calculatePortion(food: FoodItem, mealTargetCalories: number, dailyCalories: number, foodCategory: FoodCategory): FoodInMeal {
+function calculatePortion(food: FoodItem, mealTargetCalories: number, dailyCalories: number, foodCategory: FoodCategory, mealType: MealGroup): FoodInMeal {
   const baseCalories = food.nutrition.calories;
   const basePortion = food.portion.amount;
   const portionDesc = food.portion.description;
   
   // CALCULAR CALORIAS ALVO PARA ESTE ALIMENTO ESPECÍFICO
   let targetFoodCalories: number;
-  
-  if (foodCategory === 'protein') {
-    targetFoodCalories = mealTargetCalories * 0.30; // 30% das calorias da refeição para proteína
-  } else if (foodCategory === 'carb') {
-    targetFoodCalories = mealTargetCalories * 0.30; // 30% das calorias da refeição para carboidrato
-  } else if (foodCategory === 'fat') {
-    targetFoodCalories = mealTargetCalories * 0.10; // 10% das calorias da refeição para gordura
-  } else if (foodCategory === 'fruit' || foodCategory === 'dairy' || foodCategory === 'legume') {
-    targetFoodCalories = baseCalories; // Para esses, a porção base é geralmente fixa
+
+  // Verificar se é refeição de almoço/jantar (que tem gordura obrigatória)
+  const hasObligatoryFat = (mealType === 'lunch' || mealType === 'dinner');
+  const fatCalories = hasObligatoryFat ? 88 : 0; // Estimativa de calorias de uma porção de gordura (azeite)
+
+  // Ajustar proporções (começar menor porque haverá compensação depois)
+  if (dailyCalories >= 3000) {
+    // DIETA DE GANHO DE MASSA (3000+ kcal)
+    if (foodCategory === 'protein') {
+      targetFoodCalories = (mealTargetCalories - fatCalories) * 0.35;
+    } else if (foodCategory === 'carb') {
+      targetFoodCalories = (mealTargetCalories - fatCalories) * 0.40;
+    } else if (foodCategory === 'fat') {
+      targetFoodCalories = mealTargetCalories * 0.08;
+    } else if (foodCategory === 'fruit') {
+      targetFoodCalories = baseCalories;
+    } else if (foodCategory === 'dairy') {
+      targetFoodCalories = baseCalories;
+    } else if (foodCategory === 'legume') {
+      targetFoodCalories = baseCalories;
+    } else {
+      targetFoodCalories = baseCalories;
+    }
+  } else if (dailyCalories >= 2500) {
+    // DIETA DE MANUTENÇÃO (2500-2999 kcal)
+    if (foodCategory === 'protein') {
+      targetFoodCalories = (mealTargetCalories - fatCalories) * 0.30;
+    } else if (foodCategory === 'carb') {
+      targetFoodCalories = (mealTargetCalories - fatCalories) * 0.35;
+    } else if (foodCategory === 'fat') {
+      targetFoodCalories = mealTargetCalories * 0.08;
+    } else if (foodCategory === 'fruit') {
+      targetFoodCalories = baseCalories;
+    } else if (foodCategory === 'dairy') {
+      targetFoodCalories = baseCalories;
+    } else if (foodCategory === 'legume') {
+      targetFoodCalories = baseCalories;
+    } else {
+      targetFoodCalories = baseCalories;
+    }
   } else {
-    targetFoodCalories = baseCalories;
+    // DIETA DE EMAGRECIMENTO (<2500 kcal)
+    if (foodCategory === 'protein') {
+      targetFoodCalories = (mealTargetCalories - fatCalories) * 0.28;
+    } else if (foodCategory === 'carb') {
+      targetFoodCalories = (mealTargetCalories - fatCalories) * 0.28;
+    } else if (foodCategory === 'fat') {
+      targetFoodCalories = mealTargetCalories * 0.08;
+    } else if (foodCategory === 'fruit') {
+      targetFoodCalories = baseCalories;
+    } else if (foodCategory === 'dairy') {
+      targetFoodCalories = baseCalories;
+    } else if (foodCategory === 'legume') {
+      targetFoodCalories = baseCalories;
+    } else {
+      targetFoodCalories = baseCalories;
+    }
   }
   
   // Calcular multiplicador inicial
@@ -303,17 +484,17 @@ function calculatePortion(food: FoodItem, mealTargetCalories: number, dailyCalor
   let maxMultiplier: number;
   
   if (dailyCalories <= 1500) {
-    maxMultiplier = 1.5;
-  } else if (dailyCalories <= 2000) {
     maxMultiplier = 2.0;
-  } else if (dailyCalories <= 2500) {
+  } else if (dailyCalories <= 2000) {
     maxMultiplier = 2.5;
-  } else if (dailyCalories <= 3000) {
+  } else if (dailyCalories <= 2500) {
     maxMultiplier = 3.0;
-  } else if (dailyCalories <= 3500) {
-    maxMultiplier = 3.5;
-  } else {
+  } else if (dailyCalories <= 3000) {
     maxMultiplier = 4.0;
+  } else if (dailyCalories <= 3500) {
+    maxMultiplier = 5.0;
+  } else {
+    maxMultiplier = 6.0;
   }
   
   // APLICAR LIMITES POR CATEGORIA
