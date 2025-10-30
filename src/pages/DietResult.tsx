@@ -118,10 +118,19 @@ const DietResult: React.FC<DietResultProps> = ({ userData, resetUserData, naviga
                     className="text-xs sm:text-sm text-text-primary py-0.5 sm:py-1"
                   >
                     <span className="font-medium">{food.quantity}</span> {food.name}
-                    {food.substitution && (
-                      <span className="text-text-tertiary italic ml-2">
-                        (Sugestão: {food.substitution.quantity} {food.substitution.name})
-                      </span>
+                    {(food.substitution1 || food.substitution2) && (
+                      <div className="mt-1 text-text-tertiary italic text-[11px] sm:text-xs">
+                        {food.substitution1 && (
+                          <p className="mb-0.5">
+                            Sugestão 1: {food.substitution1.quantity} {food.substitution1.name}
+                          </p>
+                        )}
+                        {food.substitution2 && (
+                          <p className="mb-0.5">
+                            Sugestão 2: {food.substitution2.quantity} {food.substitution2.name}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 ))}

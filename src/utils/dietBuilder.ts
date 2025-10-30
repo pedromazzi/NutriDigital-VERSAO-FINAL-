@@ -12,7 +12,8 @@ interface FoodInMeal {
   name: string;
   quantity: string;
   calories: number;
-  substitution: SubstitutionDetails | null;
+  substitution1: SubstitutionDetails | null; // Alterado para suportar duas substituições
+  substitution2: SubstitutionDetails | null; // Adicionado para suportar duas substituições
 }
 
 interface MealPlan {
@@ -276,6 +277,133 @@ function compensateMissingCalories(foods: FoodInMeal[], targetCalories: number, 
   return foods;
 }
 
+// 🔄 ENCONTRAR 2 SUBSTITUIÇÕES COM QUANTIDADE PROPORCIONAL
+function findSubstitution(food: FoodItem, mealType: MealGroup, availableFoods: FoodDatabaseType, mainFoodCalories: number) {
+  const isBreakfast = mealType === 'breakfast' || mealType === 'snack';
+  
+  let substitutes: FoodItem[] = [];
+  
+  if (food.category === 'protein') {
+    substitutes = isBreakfast 
+      ? availableFoods.breakfast_proteins 
+      : availableFoods.lunch_proteins;
+  } else if (food.category === 'carb') {
+    substitutes = isBreakfast
+      ? availableFoods.breakfast_carbs
+      : availableFoods.lunch_carbs;
+  }
+  
+  // Filtrar para não sugerir o próprio alimento
+  substitutes = substitutes.filter(f => f.id !== food.id);
+  
+  if (substitutes.length === 0) return null;
+  
+  // Embaralhar array para pegar 2 aleatórios diferentes
+  const shuffled = substitutes.sort(() => Math.random() - 0.5);
+  
+  // Pegar até 2 substituições
+  const sub1 = shuffled[0];
+  const sub2 = shuffled[1] || null;
+  
+  // Calcular quantidade proporcional baseada nas calorias
+  const calculateProportionalQuantity = (substitute: FoodItem) => {
+    const substituteCaloriesPer100 = substitute.nutrition.calories; // Assumindo que nutrition.calories é por porção base
+    const substituteUnit = substitute.portion.unit;
+    const substitutePortionAmount = substitute.portion.amount;
+    
+    // Calcular quantos gramas/ml precisa para igualar as calorias
+    let targetAmount;
+    
+    if (substituteUnit === 'g' || substituteUnit === 'ml') {
+      // Para gramas/ml: calcular proporcionalmente
+      // Se nutrition.calories é por porção base (e portion.amount é a quantidade dessa porção),
+      // então caloriesPerGram = substituteCaloriesPer100 / substitutePortionAmount
+      const caloriesPerGramOrMl = substituteCaloriesPer100 / substitutePortionAmount;
+      targetAmount = Math.round((mainFoodCalories / caloriesPerGramOrMl) / 10) * 10; // Arredonda para o 10 mais próximo
+      return `${targetAmount}${substituteUnit}`;
+    } else if (substitute.portion.description.includes('unidade')) {
+      // Para unidades: calcular quantas unidades
+      const caloriesPerUnit = substituteCaloriesPer100; // Aqui, nutrition.calories é por unidade
+      const units = Math.max(1, Math.round(mainFoodCalories / caloriesPerUnit));
+      return `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
+    } else if (substitute.portion.description.includes('fatia')) {
+      // Para fatias: calcular quantas fatias
+      const caloriesPerSlice = substituteCaloriesPer100; // Aqui, nutrition.calories é por fatia
+      const slices = Math.max(1, Math.round(mainFoodCalories / caloriesPerSlice));
+      return `${slices} ${slices === 1 ? 'fatia' : 'fatias'}`;
+    } else if (substitute.portion.description.includes('colher')) {
+      // Para colheres: calcular quantas colheres
+      const caloriesPerSpoon = substituteCaloriesPer100; // Aqui, nutrition.calories é por colher
+      const spoons = Math.max(1, Math.round(mainFoodCalories / caloriesPerSpoon));
+      return `${spoons} ${spoons === 1 ? 'colher de sopa' : 'colheres de sopa'}`;
+    } else if (substitute.portion.description.includes('scoop')) {
+      // Para scoops: calcular quantos scoops
+      const caloriesPerScoop = substituteCaloriesPer100; // Aqui, nutrition.calories é por scoop
+      const scoops = Math.max(1, Math.round(mainFoodCalories / caloriesPerScoop));
+      return `${scoops} ${scoops === 1 ? 'scoop' : 'scoops'}`;
+    } else {
+      // Fallback: usar descrição padrão
+      return substitute.portion.description;
+    }
+  };
+  
+  return {
+    substitution1: sub1 ? {
+      name: sub1.name.toLowerCase(),
+      quantity: calculateProportionalQuantity(sub1)
+    } : null,
+    substitution2: sub2 ? {
+      name: sub2.name.toLowerCase(),
+      quantity: calculateProportionalQuantity(sub2)
+    } : null
+  };
+}
+
+// 🍎 ENCONTRAR 2 SUBSTITUIÇÕES PARA FRUTA COM QUANTIDADE PROPORCIONAL
+function findFruitSubstitution(fruit: FoodItem, availableFruits: FoodItem[], mainFoodCalories: number) {
+  const otherFruits = availableFruits.filter(f => f.id !== fruit.id);
+  
+  if (otherFruits.length === 0) return null;
+  
+  // Embaralhar e pegar até 2
+  const shuffled = otherFruits.sort(() => Math.random() - 0.5);
+  
+  const sub1 = shuffled[0];
+  const sub2 = shuffled[1] || null;
+  
+  // Calcular quantidade proporcional para frutas
+  const calculateFruitQuantity = (substitute: FoodItem) => {
+    const substituteCaloriesPerPortion = substitute.nutrition.calories; // Calorias da porção base
+    const substitutePortionAmount = substitute.portion.amount; // Quantidade da porção base (ex: 100g)
+    const substituteUnit = substitute.portion.unit; // Unidade da porção base (ex: 'g')
+
+    if (substitute.portion.description.includes('unidade')) {
+      // Para unidades: calcular quantas unidades
+      const units = Math.max(1, Math.round(mainFoodCalories / substituteCaloriesPerPortion));
+      return `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
+    } else if (substituteUnit === 'g') {
+      // Para gramas: calcular proporcionalmente
+      const caloriesPerGram = substituteCaloriesPerPortion / substitutePortionAmount;
+      const targetGrams = Math.round((mainFoodCalories / caloriesPerGram) / 10) * 10; // Arredonda para o 10 mais próximo
+      return `${targetGrams}g`;
+    } else {
+      // Fallback: usar descrição padrão
+      return substitute.portion.description;
+    }
+  };
+  
+  return {
+    substitution1: sub1 ? {
+      name: sub1.name.toLowerCase(),
+      quantity: calculateFruitQuantity(sub1)
+    } : null,
+    substitution2: sub2 ? {
+      name: sub2.name.toLowerCase(),
+      quantity: calculateFruitQuantity(sub2)
+    } : null
+  };
+}
+
 // 🍽️ MONTAR UMA REFEIÇÃO
 function buildMeal(
   name: string,
@@ -301,9 +429,12 @@ function buildMeal(
   
   if (proteinFood) {
     const proteinPortion = calculatePortion(proteinFood, mealTargetCalories, dailyCalories, proteinFood.category, mealType);
+    const substitutions = findSubstitution(proteinFood, mealType, availableFoods, proteinPortion.calories);
+    
     foods.push({
       ...proteinPortion,
-      substitution: findSubstitution(proteinFood, mealType, availableFoods)
+      substitution1: substitutions?.substitution1 || null,
+      substitution2: substitutions?.substitution2 || null
     });
     currentCalories += proteinPortion.calories;
   }
@@ -318,9 +449,12 @@ function buildMeal(
   
   if (carbFood) {
     const carbPortion = calculatePortion(carbFood, mealTargetCalories, dailyCalories, carbFood.category, mealType);
+    const substitutions = findSubstitution(carbFood, mealType, availableFoods, carbPortion.calories);
+    
     foods.push({
       ...carbPortion,
-      substitution: findSubstitution(carbFood, mealType, availableFoods)
+      substitution1: substitutions?.substitution1 || null,
+      substitution2: substitutions?.substitution2 || null
     });
     currentCalories += carbPortion.calories;
   }
@@ -330,11 +464,17 @@ function buildMeal(
     const fruitFood = selectFood(preferences.fruits, availableFoods.fruits);
     
     if (fruitFood) {
-      const fruitPortion = calculatePortion(fruitFood, mealTargetCalories, dailyCalories, fruitFood.category, mealType);
-      foods.push({
-        ...fruitPortion,
-        substitution: findFruitSubstitution(fruitFood, availableFoods.fruits)
-      });
+      const fruitCalories = fruitFood.nutrition.calories;
+      const substitutions = findFruitSubstitution(fruitFood, availableFoods.fruits, fruitCalories);
+      
+      const fruitPortion = {
+        name: fruitFood.name.toLowerCase(),
+        quantity: fruitFood.portion.description,
+        calories: fruitCalories,
+        substitution1: substitutions?.substitution1 || null,
+        substitution2: substitutions?.substitution2 || null
+      };
+      foods.push(fruitPortion);
       currentCalories += fruitPortion.calories;
     }
   }
@@ -345,7 +485,7 @@ function buildMeal(
     
     if (dairyFood && (currentCalories + dairyFood.nutrition.calories) <= mealTargetCalories + 50) {
       const dairyPortion = calculatePortion(dairyFood, mealTargetCalories, dailyCalories, dairyFood.category, mealType);
-      foods.push(dairyPortion);
+      foods.push({ ...dairyPortion, substitution1: null, substitution2: null }); // Laticínios não têm substituição
       currentCalories += dairyPortion.calories;
     }
   }
@@ -356,7 +496,7 @@ function buildMeal(
     
     if (legumeFood && (currentCalories + legumeFood.nutrition.calories) <= mealTargetCalories + 50) {
       const legumePortion = calculatePortion(legumeFood, mealTargetCalories, dailyCalories, legumeFood.category, mealType);
-      foods.push(legumePortion);
+      foods.push({ ...legumePortion, substitution1: null, substitution2: null }); // Leguminosas não têm substituição
       currentCalories += legumePortion.calories;
     }
   }
@@ -368,7 +508,7 @@ function buildMeal(
     
     if (fatFood) {
       const fatPortion = calculatePortion(fatFood, mealTargetCalories, dailyCalories, fatFood.category, mealType);
-      foods.push(fatPortion);
+      foods.push({ ...fatPortion, substitution1: null, substitution2: null }); // Gorduras não têm substituição
       currentCalories += fatPortion.calories;
     } else {
       // Fallback: se por algum motivo não encontrar, adiciona azeite
@@ -376,7 +516,7 @@ function buildMeal(
       const azeite = availableFoods.fats.find(f => f.id === 'azeite');
       if (azeite) {
         const azeitePortion = calculatePortion(azeite, mealTargetCalories, dailyCalories, azeite.category, mealType);
-        foods.push(azeitePortion);
+        foods.push({ ...azeitePortion, substitution1: null, substitution2: null });
         currentCalories += azeitePortion.calories;
       }
     }
@@ -389,7 +529,8 @@ function buildMeal(
       name: 'vegetais',
       quantity: 'à gosto',
       calories: 0,
-      substitution: null
+      substitution1: null,
+      substitution2: null
     });
   }
   
@@ -578,51 +719,8 @@ function calculatePortion(food: FoodItem, mealTargetCalories: number, dailyCalor
     name: food.name.toLowerCase(),
     quantity: quantityText,
     calories: actualCalories,
-    substitution: null
-  };
-}
-
-// 🔄 ENCONTRAR SUBSTITUIÇÃO PARA PROTEÍNA/CARBOIDRATO
-function findSubstitution(food: FoodItem, mealType: MealGroup, availableFoods: FoodDatabaseType): SubstitutionDetails | null {
-  const isBreakfast = mealType === 'breakfast' || mealType === 'snack';
-  
-  let substitutes: FoodItem[] = [];
-  
-  if (food.category === 'protein') {
-    substitutes = isBreakfast 
-      ? availableFoods.breakfast_proteins 
-      : availableFoods.lunch_proteins;
-  } else if (food.category === 'carb') {
-    substitutes = isBreakfast
-      ? availableFoods.breakfast_carbs
-      : availableFoods.lunch_carbs;
-  }
-  
-  // Filtrar para não sugerir o próprio alimento
-  substitutes = substitutes.filter(f => f.id !== food.id);
-  
-  if (substitutes.length === 0) return null;
-  
-  // Escolher aleatoriamente
-  const substitute = substitutes[Math.floor(Math.random() * substitutes.length)];
-  
-  return {
-    name: substitute.name.toLowerCase(),
-    quantity: substitute.portion.description
-  };
-}
-
-// 🍎 ENCONTRAR SUBSTITUIÇÃO PARA FRUTA
-function findFruitSubstitution(fruit: FoodItem, availableFruits: FoodItem[]): SubstitutionDetails | null {
-  const otherFruits = availableFruits.filter(f => f.id !== fruit.id);
-  
-  if (otherFruits.length === 0) return null;
-  
-  const substitute = otherFruits[Math.floor(Math.random() * otherFruits.length)];
-  
-  return {
-    name: substitute.name.toLowerCase(),
-    quantity: substitute.portion.description
+    substitution1: null, // Inicializa como null
+    substitution2: null  // Inicializa como null
   };
 }
 
