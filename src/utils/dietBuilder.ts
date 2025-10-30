@@ -332,11 +332,15 @@ function findSubstitution(food: FoodItem, mealType: MealGroup, availableFoods: F
     let quantityText = '';
     
     if (substituteUnit === 'g' || substituteUnit === 'ml') {
-      // Calculate calories per unit (g or ml)
-      const caloriesPerUnit = substituteCaloriesPerPortion / substituteBasePortionAmount;
-      const targetAmount = Math.round((mainFoodCalories / caloriesPerUnit) / 10) * 10; // Round to nearest 10
+      // SEMPRE normalizar para calorias por 100g/100ml
+      const caloriesPer100 = (substituteCaloriesPerPortion / substituteBasePortionAmount) * 100;
+      console.log('  📊 Calorias por 100g/ml (normalizado):', caloriesPer100);
+      
+      // Calcular quantidade necessária para igualar as calorias principais
+      const targetAmount = Math.round((mainFoodCalories / caloriesPer100) * 100 / 10) * 10;
       quantityText = `${targetAmount}${substituteUnit}`;
       console.log('  ✅ Quantidade calculada (g/ml):', quantityText);
+      console.log(`  🔢 Verificação: ${targetAmount}${substituteUnit} × ${caloriesPer100}/100 = ${Math.round((targetAmount / 100) * caloriesPer100)} kcal (meta: ${mainFoodCalories} kcal)`);
     } else if (substitutePortionDescription.includes('unidade')) {
       const caloriesPerUnit = substituteCaloriesPerPortion; // Assuming nutrition.calories is for 1 unit
       const units = Math.max(1, Math.round(mainFoodCalories / caloriesPerUnit));
@@ -426,11 +430,14 @@ function findFruitSubstitution(fruit: FoodItem, availableFruits: FoodItem[], mai
       quantityText = `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
       console.log('  ✅ Quantidade calculada (unidade):', quantityText);
     } else if (substituteUnit === 'g') {
-      // Para gramas: calcular proporcionalmente
-      const caloriesPerGram = substituteCaloriesPerPortion / substitutePortionAmount;
-      const targetGrams = Math.round((mainFoodCalories / caloriesPerGram) / 10) * 10; // Arredonda para o 10 mais próximo
+      // Para gramas: SEMPRE normalizar para calorias por 100g
+      const caloriesPer100g = (substituteCaloriesPerPortion / substitutePortionAmount) * 100;
+      console.log('  📊 Calorias por 100g (normalizado):', caloriesPer100g);
+      
+      const targetGrams = Math.round((mainFoodCalories / caloriesPer100g) * 100 / 10) * 10;
       quantityText = `${targetGrams}g`;
       console.log('  ✅ Quantidade calculada (g):', quantityText);
+      console.log(`  🔢 Verificação: ${targetGrams}g × ${caloriesPer100g}/100 = ${Math.round((targetGrams / 100) * caloriesPer100g)} kcal (meta: ${mainFoodCalories} kcal)`);
     } else {
       // Fallback: usar descrição padrão
       quantityText = substitute.portion.description;
