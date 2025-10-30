@@ -279,6 +279,11 @@ function compensateMissingCalories(foods: FoodInMeal[], targetCalories: number, 
 
 // 🔄 ENCONTRAR 2 SUBSTITUIÇÕES COM QUANTIDADE PROPORCIONAL
 function findSubstitution(food: FoodItem, mealType: MealGroup, availableFoods: FoodDatabaseType, mainFoodCalories: number) {
+  console.log('🔍 === INICIANDO findSubstitution ===');
+  console.log('📦 Alimento principal:', food.name);
+  console.log('🔥 Calorias recebidas:', mainFoodCalories);
+  console.log('🍽️ Tipo de refeição:', mealType);
+  
   const isBreakfast = mealType === 'breakfast' || mealType === 'snack';
   
   let substitutes: FoodItem[] = [];
@@ -296,7 +301,11 @@ function findSubstitution(food: FoodItem, mealType: MealGroup, availableFoods: F
   // Filtrar para não sugerir o próprio alimento
   substitutes = substitutes.filter(f => f.id !== food.id);
   
-  if (substitutes.length === 0) return null;
+  if (substitutes.length === 0) {
+    console.log('❌ Nenhuma substituição encontrada.');
+    console.log('🔍 === FIM findSubstitution ===\n');
+    return null;
+  }
   
   // Embaralhar array para pegar 2 aleatórios diferentes
   const shuffled = substitutes.sort(() => Math.random() - 0.5);
@@ -307,47 +316,55 @@ function findSubstitution(food: FoodItem, mealType: MealGroup, availableFoods: F
   
   // Calcular quantidade proporcional baseada nas calorias
   const calculateProportionalQuantity = (substitute: FoodItem) => {
-    const substituteCaloriesPer100 = substitute.nutrition.calories; // Assumindo que nutrition.calories é por porção base
-    const substituteUnit = substitute.portion.unit;
-    const substitutePortionAmount = substitute.portion.amount;
+    console.log('  📊 === Calculando substituição ===');
+    console.log('  🥘 Substituto:', substitute.name);
     
-    // Calcular quantos gramas/ml precisa para igualar as calorias
-    let targetAmount;
+    const substituteCaloriesPerPortion = substitute.nutrition.calories; // Assumindo que nutrition.calories é por porção base
+    console.log('  📈 Calorias por porção base do substituto:', substituteCaloriesPerPortion);
+    
+    const substituteBasePortionAmount = substitute.portion.amount; // e.g., 100 for 100g
+    const substituteUnit = substitute.portion.unit; // e.g., 'g'
+    const substitutePortionDescription = substitute.portion.description; // e.g., '100g', '1 unidade'
+    console.log('  📏 Unidade da porção base:', substituteUnit);
+    console.log('  📏 Quantidade da porção base:', substituteBasePortionAmount);
+    console.log('  📝 Descrição da porção:', substitutePortionDescription);
+    
+    let quantityText = '';
     
     if (substituteUnit === 'g' || substituteUnit === 'ml') {
-      // Para gramas/ml: calcular proporcionalmente
-      // Se nutrition.calories é por porção base (e portion.amount é a quantidade dessa porção),
-      // então caloriesPerGram = substituteCaloriesPer100 / substitutePortionAmount
-      const caloriesPerGramOrMl = substituteCaloriesPer100 / substitutePortionAmount;
-      targetAmount = Math.round((mainFoodCalories / caloriesPerGramOrMl) / 10) * 10; // Arredonda para o 10 mais próximo
-      return `${targetAmount}${substituteUnit}`;
-    } else if (substitute.portion.description.includes('unidade')) {
-      // Para unidades: calcular quantas unidades
-      const caloriesPerUnit = substituteCaloriesPer100; // Aqui, nutrition.calories é por unidade
+      // Calculate calories per unit (g or ml)
+      const caloriesPerUnit = substituteCaloriesPerPortion / substituteBasePortionAmount;
+      const targetAmount = Math.round((mainFoodCalories / caloriesPerUnit) / 10) * 10; // Round to nearest 10
+      quantityText = `${targetAmount}${substituteUnit}`;
+      console.log('  ✅ Quantidade calculada (g/ml):', quantityText);
+    } else if (substitutePortionDescription.includes('unidade')) {
+      const caloriesPerUnit = substituteCaloriesPerPortion; // Assuming nutrition.calories is for 1 unit
       const units = Math.max(1, Math.round(mainFoodCalories / caloriesPerUnit));
-      return `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
-    } else if (substitute.portion.description.includes('fatia')) {
-      // Para fatias: calcular quantas fatias
-      const caloriesPerSlice = substituteCaloriesPer100; // Aqui, nutrition.calories é por fatia
+      quantityText = `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
+      console.log('  ✅ Quantidade calculada (unidade):', quantityText);
+    } else if (substitutePortionDescription.includes('fatia')) {
+      const caloriesPerSlice = substituteCaloriesPerPortion; // Assuming nutrition.calories is for 1 slice
       const slices = Math.max(1, Math.round(mainFoodCalories / caloriesPerSlice));
-      return `${slices} ${slices === 1 ? 'fatia' : 'fatias'}`;
-    } else if (substitute.portion.description.includes('colher')) {
-      // Para colheres: calcular quantas colheres
-      const caloriesPerSpoon = substituteCaloriesPer100; // Aqui, nutrition.calories é por colher
+      quantityText = `${slices} ${slices === 1 ? 'fatia' : 'fatias'}`;
+      console.log('  ✅ Quantidade calculada (fatia):', quantityText);
+    } else if (substitutePortionDescription.includes('colher')) {
+      const caloriesPerSpoon = substituteCaloriesPerPortion; // Assuming nutrition.calories is for 1 spoon
       const spoons = Math.max(1, Math.round(mainFoodCalories / caloriesPerSpoon));
-      return `${spoons} ${spoons === 1 ? 'colher de sopa' : 'colheres de sopa'}`;
-    } else if (substitute.portion.description.includes('scoop')) {
-      // Para scoops: calcular quantos scoops
-      const caloriesPerScoop = substituteCaloriesPer100; // Aqui, nutrition.calories é por scoop
+      quantityText = `${spoons} ${spoons === 1 ? 'colher de sopa' : 'colheres de sopa'}`;
+      console.log('  ✅ Quantidade calculada (colher):', quantityText);
+    } else if (substitutePortionDescription.includes('scoop')) {
+      const caloriesPerScoop = substituteCaloriesPerPortion; // Assuming nutrition.calories is for 1 scoop
       const scoops = Math.max(1, Math.round(mainFoodCalories / caloriesPerScoop));
-      return `${scoops} ${scoops === 1 ? 'scoop' : 'scoops'}`;
+      quantityText = `${scoops} ${scoops === 1 ? 'scoop' : 'scoops'}`;
+      console.log('  ✅ Quantidade calculada (scoop):', quantityText);
     } else {
-      // Fallback: usar descrição padrão
-      return substitute.portion.description;
+      quantityText = substitute.portion.description;
+      console.log('  ⚠️ Fallback: usando descrição padrão:', quantityText);
     }
+    return quantityText;
   };
   
-  return {
+  const result = {
     substitution1: sub1 ? {
       name: sub1.name.toLowerCase(),
       quantity: calculateProportionalQuantity(sub1)
@@ -357,13 +374,28 @@ function findSubstitution(food: FoodItem, mealType: MealGroup, availableFoods: F
       quantity: calculateProportionalQuantity(sub2)
     } : null
   };
+
+  console.log('✅ Substituições geradas:');
+  console.log('  Sub1:', result.substitution1);
+  console.log('  Sub2:', result.substitution2);
+  console.log('🔍 === FIM findSubstitution ===\n');
+
+  return result;
 }
 
 // 🍎 ENCONTRAR 2 SUBSTITUIÇÕES PARA FRUTA COM QUANTIDADE PROPORCIONAL
 function findFruitSubstitution(fruit: FoodItem, availableFruits: FoodItem[], mainFoodCalories: number) {
+  console.log('🔍 === INICIANDO findFruitSubstitution ===');
+  console.log('📦 Fruta principal:', fruit.name);
+  console.log('🔥 Calorias recebidas:', mainFoodCalories);
+
   const otherFruits = availableFruits.filter(f => f.id !== fruit.id);
   
-  if (otherFruits.length === 0) return null;
+  if (otherFruits.length === 0) {
+    console.log('❌ Nenhuma substituição de fruta encontrada.');
+    console.log('🔍 === FIM findFruitSubstitution ===\n');
+    return null;
+  }
   
   // Embaralhar e pegar até 2
   const shuffled = otherFruits.sort(() => Math.random() - 0.5);
@@ -373,26 +405,41 @@ function findFruitSubstitution(fruit: FoodItem, availableFruits: FoodItem[], mai
   
   // Calcular quantidade proporcional para frutas
   const calculateFruitQuantity = (substitute: FoodItem) => {
+    console.log('  📊 === Calculando substituição de fruta ===');
+    console.log('  🍎 Substituto:', substitute.name);
+
     const substituteCaloriesPerPortion = substitute.nutrition.calories; // Calorias da porção base
+    console.log('  📈 Calorias por porção base do substituto:', substituteCaloriesPerPortion);
+
     const substitutePortionAmount = substitute.portion.amount; // Quantidade da porção base (ex: 100g)
     const substituteUnit = substitute.portion.unit; // Unidade da porção base (ex: 'g')
+    const substitutePortionDescription = substitute.portion.description;
+    console.log('  📏 Unidade da porção base:', substituteUnit);
+    console.log('  📏 Quantidade da porção base:', substitutePortionAmount);
+    console.log('  📝 Descrição da porção:', substitutePortionDescription);
 
-    if (substitute.portion.description.includes('unidade')) {
+    let quantityText = '';
+
+    if (substitutePortionDescription.includes('unidade')) {
       // Para unidades: calcular quantas unidades
       const units = Math.max(1, Math.round(mainFoodCalories / substituteCaloriesPerPortion));
-      return `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
+      quantityText = `${units} ${units === 1 ? 'unidade' : 'unidades'}`;
+      console.log('  ✅ Quantidade calculada (unidade):', quantityText);
     } else if (substituteUnit === 'g') {
       // Para gramas: calcular proporcionalmente
       const caloriesPerGram = substituteCaloriesPerPortion / substitutePortionAmount;
       const targetGrams = Math.round((mainFoodCalories / caloriesPerGram) / 10) * 10; // Arredonda para o 10 mais próximo
-      return `${targetGrams}g`;
+      quantityText = `${targetGrams}g`;
+      console.log('  ✅ Quantidade calculada (g):', quantityText);
     } else {
       // Fallback: usar descrição padrão
-      return substitute.portion.description;
+      quantityText = substitute.portion.description;
+      console.log('  ⚠️ Fallback: usando descrição padrão:', quantityText);
     }
+    return quantityText;
   };
   
-  return {
+  const result = {
     substitution1: sub1 ? {
       name: sub1.name.toLowerCase(),
       quantity: calculateFruitQuantity(sub1)
@@ -402,6 +449,13 @@ function findFruitSubstitution(fruit: FoodItem, availableFruits: FoodItem[], mai
       quantity: calculateFruitQuantity(sub2)
     } : null
   };
+
+  console.log('✅ Substituições de frutas geradas:');
+  console.log('  Sub1:', result.substitution1);
+  console.log('  Sub2:', result.substitution2);
+  console.log('🔍 === FIM findFruitSubstitution ===\n');
+
+  return result;
 }
 
 // 🍽️ MONTAR UMA REFEIÇÃO
