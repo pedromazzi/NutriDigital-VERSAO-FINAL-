@@ -597,6 +597,65 @@ function buildMeal(
   
   // APLICAR COMPENSAÇÃO AUTOMÁTICA DE CALORIAS
   foods = compensateMissingCalories(foods, mealTargetCalories, currentCalories, dailyCalories, mealType);
+
+  // RECALCULAR SUBSTITUIÇÕES APÓS COMPENSAÇÃO
+  console.log('🔄 Recalculando substituições após compensação...');
+
+  foods = foods.map((food) => {
+    // Find the original FoodItem from the database using its name
+    let originalFoodItem: FoodItem | undefined;
+
+    // Helper to find food across all relevant categories for the meal type
+    const findOriginalFood = (foodName: string, mealType: MealGroup, db: FoodDatabaseType): FoodItem | undefined => {
+      const allFoodsForMealType: FoodItem[] = [];
+      
+      // Collect all foods that could be part of this meal type
+      if (mealType === 'breakfast' || mealType === 'snack') {
+        allFoodsForMealType.push(...db.breakfast_proteins, ...db.breakfast_carbs, ...db.fruits, ...db.dairy, ...db.fats);
+      } else { // lunch or dinner
+        allFoodsForMealType.push(...db.lunch_proteins, ...db.lunch_carbs, ...db.legumes, ...db.fats);
+      }
+      
+      // Filter out duplicates if any and find by name
+      const uniqueFoods = Array.from(new Set(allFoodsForMealType)); // Remove potential duplicates
+      return uniqueFoods.find(f => f.name.toLowerCase() === foodName);
+    };
+
+    originalFoodItem = findOriginalFood(food.name, mealType, availableFoods);
+
+    // If not a protein, carb, or fruit, or if original food item not found, return as is.
+    // The current findSubstitution/findFruitSubstitution only handle these categories.
+    const isSubstitutableCategory = originalFoodItem && 
+                                    (originalFoodItem.category === 'protein' || 
+                                     originalFoodItem.category === 'carb' || 
+                                     originalFoodItem.category === 'fruit');
+
+    if (!originalFoodItem || !isSubstitutableCategory) {
+      return food;
+    }
+
+    // Recalcular substituições baseado nas calorias FINAIS
+    let newSubstitutions = null;
+    
+    if (originalFoodItem.category === 'protein' || originalFoodItem.category === 'carb') {
+      newSubstitutions = findSubstitution(originalFoodItem, mealType, availableFoods, food.calories);
+    } else if (originalFoodItem.category === 'fruit') {
+      newSubstitutions = findFruitSubstitution(originalFoodItem, availableFoods.fruits, food.calories);
+    }
+
+    // Atualizar substituições
+    if (newSubstitutions) {
+      return {
+        ...food,
+        substitution1: newSubstitutions.substitution1,
+        substitution2: newSubstitutions.substitution2
+      };
+    }
+
+    return food;
+  });
+
+  console.log('✅ Substituições recalculadas!');
   
   // Recalcular calorias totais após compensação
   currentCalories = foods.reduce((sum, food) => sum + food.calories, 0);
